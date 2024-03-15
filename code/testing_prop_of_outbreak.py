@@ -26,7 +26,8 @@ params = load_param_defaults()
 
 params["transmission"] = 2
 params["immune_period"] = 1e6
-params["B_fear"] = 20
+params["B_social"] = 8
+params["B_const"] = 0
 beta = params["transmission"]
 
 gamma = 1/params["infectious_period"]
@@ -38,26 +39,73 @@ w3 = params["B_const"]
 a1 = params["N_social"]
 a2 = params["N_const"]
 
+P = 10000
+I0 = 1
+B0 = 1
+
+N0 = P - B0
+
+M = bad(**params)
+M.endemic_behaviour(I_eval=0)
+
+# Nstar = M.Nstar * P
+# Bstar = (1-M.Nstar) * P
+Nstar = N0
+Bstar = B0
+
 
 def eqns_to_solve(x):
 
     q1 = x[0]
     q2 = x[1]
 
-    p1N = beta/(beta + gamma + w3)
-    p3N = gamma/(beta + gamma + w3)
-    p4N = w3/(beta + gamma + w3)
+    b_nn = beta * Nstar / P
+    b_bn = (1-p) * beta * Nstar/P
 
-    p1B = ((1-p) * beta) / ((1-p) * beta + gamma + a1 + a2)
-    p3B = gamma / ((1-p) * beta + gamma + a1 + a2)
-    p4B = (a1 + a2) / ((1-p) * beta + gamma + a1 + a2)
+    b_nb = (1-c) * beta * Bstar / P
+    b_bb = (1-c) * (1-p) * beta * Bstar / P
+
+    a1_tilde = a1 * Nstar / P
+    w1_tilde = w1 * Bstar / P
+
+    N_denom = b_nn + b_nb + gamma + w1_tilde + w3
+    p1N = b_nn/N_denom
+    p2N = b_nb/N_denom
+    p3N = gamma/N_denom
+    p4N = (w1_tilde + w3)/N_denom
+
+    B_denom = b_bn + b_bb + gamma + a1_tilde + a2
+    p1B = b_bn/B_denom
+    p2B = b_bb/B_denom
+    p3B = gamma / B_denom
+    p4B = (a1_tilde + a2) / B_denom
 
     ans = np.zeros(2)
 
-    ans[0] = q1 - (q1**2 * p1N + p3N + q2 * p4N)
-    ans[1] = q2 - (q1 * q2 * p1B + p3B + q1 * p4B)
+    ans[0] = q1 - (q1**2 * p1N + q1*q2*p2N + p3N + q2 * p4N)
+    ans[1] = q2 - (q1 * q2 * p1B + q2**2 * p2B + p3B + q1 * p4B)
 
     return ans
+
+# def eqns_to_solve(x):
+
+#     q1 = x[0]
+#     q2 = x[1]
+
+#     p1N = beta/(beta + gamma + w3)
+#     p3N = gamma/(beta + gamma + w3)
+#     p4N = w3/(beta + gamma + w3)
+
+#     p1B = ((1-p) * beta) / ((1-p) * beta + gamma + a1 + a2)
+#     p3B = gamma / ((1-p) * beta + gamma + a1 + a2)
+#     p4B = (a1 + a2) / ((1-p) * beta + gamma + a1 + a2)
+
+#     ans = np.zeros(2)
+
+#     ans[0] = q1 - (q1**2 * p1N + p3N + q2 * p4N)
+#     ans[1] = q2 - (q1 * q2 * p1B + p3B + q1 * p4B)
+
+#     return ans
 
 
 no_major_in_niave = fsolve(func=eqns_to_solve, x0=np.array([0, 0]))
@@ -212,14 +260,9 @@ def bad_ctmc(param_vals, P=100, I0=1, B0=1, t_end=100):
 # %%
 
 
-num_trajectory = 500
+num_trajectory = 200
 
 t_end = 60
-
-
-P = 10000
-I0 = 1
-B0 = 1
 
 
 model = bad_ctmc(param_vals=params, P=P, I0=I0, B0=B0, t_end=t_end)

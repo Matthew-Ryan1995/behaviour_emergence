@@ -72,11 +72,11 @@ def behaviour_sis(parameter_values=None, t_end=20, P=100, B_0=1):
 
 num_trajectory = 200
 
-t_end = 200
+t_end = 100
 
 
-w1 = 2
-w3 = 0.01
+w1 = 0.1
+w3 = 0.10
 a1 = 1.2
 a2 = 0.5
 
@@ -124,3 +124,5 @@ plt.plot(dat[:, 1], label="B")
 plt.plot(dat[:, 0], label="N")
 plt.legend()
 plt.show()
+
+print(f"Time taken: {datetime.now() - start_time}")
