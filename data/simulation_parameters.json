@@ -1,0 +1,1 @@
+{"params": {"transmission": 0.6, "infectious_period": 5, "immune_period": 0, "av_lifespan": 0, "susc_B_efficacy": 0.5, "inf_B_efficacy": 0.5, "N_social": 0.25, "B_social": 0.333, "B_fear": 1.6, "B_const": 0.04, "N_const": 0.12}, "P": 10000, "I0": 1, "B0": 1, "num_trajectory": 10, "t_end": 200, "seed": 20240430}

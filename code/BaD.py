@@ -387,7 +387,7 @@ def load_param_defaults(filename="/Users/rya200/Library/CloudStorage/OneDrive-CS
     return json_data
 
 
-def early_behaviour_dynamics(model: bad, method="exp"):
+def early_behaviour_dynamics(model: bad, method="exp", M=0):
     """
     Early stage dynamics of behaviour
 
@@ -420,14 +420,25 @@ def early_behaviour_dynamics(model: bad, method="exp"):
     k0 = model.B_const
 
     I0 = model.results[0, 2:4].sum()
+    B0 = model.results[0, [1, 3, 5]].sum()
 
     if k2 != 0.0:
         print("Method currently not implemented")
         return np.nan
 
-    bt = (k0/k3) * (np.exp(k3*tt) - 1)
-    it = ((I0 * k1) / (model.transmission - 1/model.infectious_period - k3)) * \
-        (np.exp((model.transmission - 1/model.infectious_period) * tt) - np.exp(k3 * tt))
+    # R0 = model.Rzero()
+    R0 = model.transmission * model.infectious_period
+
+    bt = (k0/k3) * (np.exp(k3*tt) - 1) + B0 * np.exp(k3 * tt)
+    if method == "exp":
+        it = ((I0 * k1) / ((R0 - 1)/model.infectious_period - k3)) * \
+            (np.exp(((R0 - 1)/model.infectious_period) * tt) - np.exp(k3 * tt))
+    else:
+        a = calculate_taylor_coeffs(I0, model, M=M)
+        it = np.zeros(tt.size)
+        for m in range(M):
+            it += a[m] * calculate_F_m(tt, m, model)
+        it *= k1
 
     return bt + it
 
@@ -441,6 +452,27 @@ def calculate_F_m(t, M, model):
         return (np.exp(k3 * t) - 1)/k3
     else:
         return (M/k3) * calculate_F_m(t=t, M=M-1, model=model) - (t**M)/k3
+
+
+def calculate_taylor_coeffs(I0, model, M=3):
+    beta = model.transmission
+    gamma = 1/model.infectious_period
+
+    a = []
+    s = []
+
+    a.append(I0)
+    s.append(1)
+
+    for m in range(1, M+1):
+        n = len(a)
+        coef = 0
+        for idx in range(n):
+            coef += s[idx] * a[-(n-idx)]
+        a.append(beta * coef - gamma * a[m-1])
+        s.append(-(a[m] + gamma * a[m-1]))
+
+    return a
 
 # The next set of functions are aimed towards calculating the steady states of the system
 
