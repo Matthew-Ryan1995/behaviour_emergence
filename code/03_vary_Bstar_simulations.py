@@ -12,29 +12,31 @@ import json
 import pickle
 import multiprocessing
 import numpy as np
+from datetime import datetime
 
+start_time = datetime.now()
 # %%
-
+phantom_counter = 0
 parent_directory = "../data/simulations"
 
 try:
     os.mkdir(parent_directory)
 except:
-    print()
+    phantom_counter += 1
 
 child_directory = parent_directory + "/vary_Bstar"
 
 try:
     os.mkdir(child_directory)
 except:
-    print()
+    phantom_counter += 1
 
 child_directory_model = parent_directory + "/model"
 
 try:
     os.mkdir(child_directory_model)
 except:
-    print()
+    phantom_counter += 1
 
 with open("../data/simulation_parameters.json", "r") as f:
     simulation_parameters = json.load(f)
@@ -95,3 +97,5 @@ if __name__ == '__main__':
 
     with multiprocessing.Pool(6) as p:
         p.map(run_simulation_with_event, Bstar)
+
+    print(f"Time taken: {datetime.now()-start_time}")

@@ -12,27 +12,27 @@ import json
 import pickle
 
 # %%
-
+phantom_counter = 0
 parent_directory = "../data/simulations"
 
 try:
     os.mkdir(parent_directory)
 except:
-    print()
+    phantom_counter += 1
 
 child_directory = parent_directory + "/baseline"
 
 try:
     os.mkdir(child_directory)
 except:
-    print()
+    phantom_counter += 1
 
 child_directory_model = parent_directory + "/model"
 
 try:
     os.mkdir(child_directory_model)
 except:
-    print()
+    phantom_counter += 1
 
 with open("../data/simulation_parameters.json", "r") as f:
     simulation_parameters = json.load(f)

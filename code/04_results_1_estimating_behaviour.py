@@ -62,6 +62,10 @@ tt = [i for i in range(len(cubic_approx)) if cubic_approx[i] < 1]
 plt.plot(range(tt[-1] + 1), cubic_approx[tt],
          linestyle="dotted", color="black")
 
+no_I_approx = early_behaviour_dynamics(M, method="none")
+tt = [i for i in range(len(no_I_approx)) if no_I_approx[i] < 1]
+plt.plot(range(tt[-1] + 1), no_I_approx[tt], color="red")
+
 plt.xlabel("time")
 plt.ylabel("Proportion")
 plt.legend(["Behaviour"])
@@ -80,7 +84,7 @@ for idx in range(num_trajectory):
     trajectory = results[idx]
     B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"]) / P
     B_snapshot.append(B[snapshot_day])
-    I = (trajectory["Ib"] + trajectory["In"]) / P
+    I = (trajectory["I_total"]) / P
     I_snapshot.append(I[snapshot_day])
 
 
@@ -95,6 +99,8 @@ plt.plot([exp_approx[snapshot_day], exp_approx[snapshot_day]],
          [1, 1], "x", color="red")
 plt.plot([cubic_approx[snapshot_day], cubic_approx[snapshot_day]],
          [1, 1], "x", color="black")
+plt.plot([no_I_approx[snapshot_day], no_I_approx[snapshot_day]],
+         [1, 1], "x", color="purple")
 plt.xlabel("Proportion doing behaviour")
 plt.ylabel("Frequency")
 plt.show()
@@ -102,6 +108,6 @@ plt.show()
 
 plt.figure()
 plt.hist(I_snapshot, bins=len(I_snapshot))
-plt.xlabel("Proportion infected")
+plt.xlabel("Proportion infected to ate")
 plt.ylabel("Frequency")
 plt.show()

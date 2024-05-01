@@ -44,7 +44,7 @@ params["B_social"] = (R0B * (params["N_social"] + params["N_const"]))
 P = 10000  # population size
 I0 = 1  # Initial infected
 B0 = 1  # Initial Behaviour
-num_trajectory = 1
+num_trajectory = 100
 
 # Number of simulation days heuristically chosen
 t_end = 200

@@ -433,12 +433,17 @@ def early_behaviour_dynamics(model: bad, method="exp", M=0):
     if method == "exp":
         it = ((I0 * k1) / ((R0 - 1)/model.infectious_period - k3)) * \
             (np.exp(((R0 - 1)/model.infectious_period) * tt) - np.exp(k3 * tt))
-    else:
+    elif method == "poly":
         a = calculate_taylor_coeffs(I0, model, M=M)
         it = np.zeros(tt.size)
         for m in range(M):
             it += a[m] * calculate_F_m(tt, m, model)
         it *= k1
+    elif method == "none":
+        it = 0
+    else:
+        print("Enter valid approximation method")
+        return np.nan
 
     return bt + it
 
