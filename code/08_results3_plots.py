@@ -3,6 +3,8 @@
 """
 Created on Wed May  1 10:21:59 2024
 
+todo: Improve standard error calculation of FS now that I am using proportions
+
 @author: rya200
 """
 # %% Libraries
@@ -10,6 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from scipy.interpolate import make_smoothing_spline
 
 # %%
 
@@ -19,16 +22,19 @@ df = pd.read_csv(file_path, index_col=0)
 file_path_baseline = "../data/df_results3_baseline.csv"
 df_baseline = pd.read_csv(file_path_baseline, index_col=0)
 
+# %% Plot parameters
+
+dpi = 600
 # %% Create new vars
 
-df["odds_ratio"] = (df["pHat"]/(1-df["pHat"])) / \
-    (df_baseline["pHat"]/(1-df_baseline["pHat"])).iloc[0]
+df["log_odds_ratio"] = np.log((df["pHat"]/(1-df["pHat"])) /
+                              (df_baseline["pHat"]/(1-df_baseline["pHat"])).iloc[0])
 
-df["odds_ratio_se"] = np.sqrt((1/df["num_trajectories"]) * (1/(df["pHat"]*(
+df["log_odds_ratio_se"] = np.sqrt((1/df["num_trajectories"]) * (1/(df["pHat"]*(
     1-df["pHat"])) + 1/(df_baseline["pHat"]*(1-df_baseline["pHat"])).iloc[0]))
 
-df["odds_ratio_lwr"] = np.exp(np.log(df["odds_ratio"]) - 1.96*df["odds_ratio"])
-df["odds_ratio_upr"] = np.exp(np.log(df["odds_ratio"]) + 1.96*df["odds_ratio"])
+df["log_odds_ratio_lwr"] = df["log_odds_ratio"] - 1.96*df["log_odds_ratio_se"]
+df["log_odds_ratio_upr"] = df["log_odds_ratio"] + 1.96*df["log_odds_ratio_se"]
 
 df["FS_diff"] = df_baseline["FS_avg"].iloc[0] - df["FS_avg"]
 df["FS_diff_se"] = np.sqrt(df_baseline["FS_std"].iloc[0]**2 + df["FS_std"]**2)
@@ -49,94 +55,349 @@ df["FS_conditional_diff_upr"] = df["FS_conditional_diff"] + \
 # %% Figure 1: Odds ratio
 # todo: All days, all Interventions
 
-target = "w3"
+target = "w1"
 day = 5
 
 plot_data = df[(df["target"] == target) & (df["day"] == day)]
-plt.figure()
+# plt.figure()
 
-l1 = sns.lineplot(data=plot_data, x="strength", y="odds_ratio")
-l2 = sns.lineplot(data=plot_data, x="strength", y="odds_ratio_lwr",
-                  linestyle="--", alpha=0.1, color="blue")
-# l3 = sns.lineplot(data=plot_data, x="strength", y="odds_ratio_upr",
+# l1 = sns.lineplot(data=plot_data, x="strength", y="odds_ratio")
+# l2 = sns.lineplot(data=plot_data, x="strength", y="odds_ratio_lwr",
 #                   linestyle="--", alpha=0.1, color="blue")
+# # l3 = sns.lineplot(data=plot_data, x="strength", y="odds_ratio_upr",
+# #                   linestyle="--", alpha=0.1, color="blue")
 
-# line = l3.get_lines()
-# plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
-#                   line[2].get_ydata(), color='blue', alpha=.1)
+# # line = l3.get_lines()
+# # plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
+# #                   line[2].get_ydata(), color='blue', alpha=.1)
 
-plt.plot([0, 5], [1, 1], "k:")
+# plt.plot([0, 5], [1, 1], "k:")
 
-plt.xlabel("Strength of intervention")
-plt.ylabel("Odds ratio of major outbreak")
-plt.show()
+# plt.xlabel("Strength of intervention")
+# plt.ylabel("Odds ratio of major outbreak")
+# plt.show()
 
 # %% Figure 1: Log-Odds ratio
 # todo: All days, all Interventions
 
-target = "w1"
-day = 5
+# strength_range = np.linspace(
+#     start=plot_data["strength"].min(), stop=plot_data["strength"].max(), num=300)
+# spl = make_smoothing_spline(np.array(plot_data["strength"]),
+#                             np.array(plot_data["log_odds_ratio"]))
+# spl_lwr = make_smoothing_spline(np.array(plot_data["strength"]),
+#                                 np.array(plot_data["log_odds_ratio_lwr"]))
+# spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
+#                                 np.array(plot_data["log_odds_ratio_upr"]))
+# log_odds_smooth = spl(strength_range)
+# log_odds_lwr_smooth = spl_lwr(strength_range)
+# log_odds_upr_smooth = spl_upr(strength_range)
 
-plot_data["lo"] = np.log(plot_data["odds_ratio"])
-plot_data["lo_lwr"] = np.log(plot_data["odds_ratio_lwr"])
-plot_data["lo_upr"] = np.log(plot_data["odds_ratio_upr"])
 
-plt.figure()
+# plt.figure()
 
-l1 = sns.lineplot(data=plot_data, x="strength", y="lo")
-l2 = sns.lineplot(data=plot_data, x="strength", y="lo_lwr",
-                  linestyle="--", alpha=0.1, color="blue")
-l3 = sns.lineplot(data=plot_data, x="strength", y="lo_upr",
-                  linestyle="--", alpha=0.1, color="blue")
+# # l1 = sns.lineplot(data=plot_data, x="strength", y="log_odds_ratio")
+# # l2 = sns.lineplot(data=plot_data, x="strength", y="log_odds_ratio_lwr",
+# #                   linestyle="--", alpha=0.1, color="blue")
+# # l3 = sns.lineplot(data=plot_data, x="strength", y="log_odds_ratio_upr",
+# #                   linestyle="--", alpha=0.1, color="blue")
 
-line = l3.get_lines()
-plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
-                 line[2].get_ydata(), color='blue', alpha=.1)
+# # line = l3.get_lines()
+# # plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
+# #                  line[2].get_ydata(), color='blue', alpha=.1)
 
-plt.plot([0, 5], [0, 0], "k:")
+# plt.scatter(plot_data["strength"],
+#             plot_data["log_odds_ratio"], color="grey", marker=".")
+# plt.plot(strength_range, log_odds_smooth, color="blue")
+# plt.fill_between(strength_range, log_odds_lwr_smooth,
+#                  log_odds_upr_smooth, color='blue', alpha=.1)
 
-plt.xlabel("Strength of intervention")
-plt.ylabel("Log-Odds ratio of major outbreak")
-plt.show()
+# plt.plot([0, 5], [0, 0], "k:")
+
+# plt.xlabel("Strength of intervention")
+# plt.ylabel("Log-Odds ratio of major outbreak")
+# plt.show()
 
 # %% Figure 2: Infections saved
 
-plt.figure()
+# spl = make_smoothing_spline(np.array(plot_data["strength"]),
+#                             np.array(plot_data["FS_diff"]))
+# spl_lwr = make_smoothing_spline(np.array(plot_data["strength"]),
+#                                 np.array(plot_data["FS_diff_lwr"]))
+# spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
+#                                 np.array(plot_data["FS_diff_upr"]))
+# FS_smooth = spl(strength_range)
+# FS_lwr_smooth = spl_lwr(strength_range)
+# FS_upr_smooth = spl_upr(strength_range)
 
-l1 = sns.lineplot(data=plot_data, x="strength", y="FS_diff", color="red")
-l2 = sns.lineplot(data=plot_data, x="strength", y="FS_diff_lwr",
-                  linestyle="--", alpha=0.1, color="red")
-l3 = sns.lineplot(data=plot_data, x="strength", y="FS_diff_upr",
-                  linestyle="--", alpha=0.1, color="red")
+# plt.figure()
 
-line = l3.get_lines()
-plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
-                 line[2].get_ydata(), color='red', alpha=.1)
+# # l1 = sns.lineplot(data=plot_data, x="strength", y="FS_diff", color="red")
+# # l2 = sns.lineplot(data=plot_data, x="strength", y="FS_diff_lwr",
+# #                   linestyle="--", alpha=0.1, color="red")
+# # l3 = sns.lineplot(data=plot_data, x="strength", y="FS_diff_upr",
+# #                   linestyle="--", alpha=0.1, color="red")
 
+# # line = l3.get_lines()
+# # plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
+# #                  line[2].get_ydata(), color='red', alpha=.1)
 
-plt.plot([-0.05, 5.05], [0, 0], "k:")
+# plt.scatter(plot_data["strength"], plot_data["FS_diff"],
+#             color="grey", marker=".")
+# plt.plot(strength_range, FS_smooth, color="red")
+# plt.fill_between(strength_range, FS_lwr_smooth,
+#                  FS_upr_smooth, color='red', alpha=.1)
 
-plt.xlabel("Strength of intervention")
-plt.ylabel("Infections saved")
-plt.show()
+# plt.plot([-0.05, 5.05], [0, 0], "k:")
+
+# plt.xlabel("Strength of intervention")
+# plt.ylabel("Infections saved")
+# plt.show()
 
 # %% Figure 2: Conditional Infections saved
 
-plt.figure()
+# spl = make_smoothing_spline(np.array(plot_data["strength"]),
+#                             np.array(plot_data["FS_conditional_diff"]))
+# spl_lwr = make_smoothing_spline(np.array(plot_data["strength"]),
+#                                 np.array(plot_data["FS_conditional_diff_lwr"]))
+# spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
+#                                 np.array(plot_data["FS_conditional_diff_upr"]))
+# FS_smooth = spl(strength_range)
+# FS_lwr_smooth = spl_lwr(strength_range)
+# FS_upr_smooth = spl_upr(strength_range)
 
-l1 = sns.lineplot(data=plot_data, x="strength",
-                  y="FS_conditional_diff", color="red")
-l2 = sns.lineplot(data=plot_data, x="strength", y="FS_conditional_diff_lwr",
-                  linestyle="--", alpha=0.1, color="red")
-l3 = sns.lineplot(data=plot_data, x="strength", y="FS_conditional_diff_upr",
-                  linestyle="--", alpha=0.1, color="red")
+# plt.figure()
+# #
+# # l1 = sns.lineplot(data=plot_data, x="strength",
+# #                   y="FS_conditional_diff", color="red")
+# # l2 = sns.lineplot(data=plot_data, x="strength", y="FS_conditional_diff_lwr",
+# #                   linestyle="--", alpha=0.1, color="red")
+# # l3 = sns.lineplot(data=plot_data, x="strength", y="FS_conditional_diff_upr",
+# #                   linestyle="--", alpha=0.1, color="red")
 
-line = l3.get_lines()
-plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
-                 line[2].get_ydata(), color='red', alpha=.1)
+# # line = l3.get_lines()
+# # plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
+# #                  line[2].get_ydata(), color='red', alpha=.1)
 
-plt.plot([-0.05, 5.05], [0, 0], "k:")
 
-plt.xlabel("Strength of intervention")
-plt.ylabel("Conditional Infections saved")
-plt.show()
+# plt.scatter(plot_data["strength"],
+#             plot_data["FS_conditional_diff"], color="grey", marker=".")
+# plt.plot(strength_range, FS_smooth, color="red")
+# plt.fill_between(strength_range, FS_lwr_smooth,
+#                  FS_upr_smooth, color='red', alpha=.1)
+
+# plt.plot([-0.05, 5.05], [0, 0], "k:")
+
+# plt.xlabel("Strength of intervention")
+# plt.ylabel("Conditional Infections saved")
+# plt.show()
+
+# %% Function it
+
+
+def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="log_odds"):
+    plot_data = df[(df["target"] == target) & (df["day"] == day)]
+
+    xmin = df["strength"].min() - 1e-1
+    xmax = df["strength"].max() + 1e-1
+
+    if plot_type == "log_odds":
+        strength_range = np.linspace(start=plot_data["strength"].min(),
+                                     stop=plot_data["strength"].max(),
+                                     num=300)
+        spl = make_smoothing_spline(np.array(plot_data["strength"]),
+                                    np.array(plot_data["log_odds_ratio"]))
+        spl_lwr = make_smoothing_spline(np.array(plot_data["strength"]),
+                                        np.array(plot_data["log_odds_ratio_lwr"]))
+        spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
+                                        np.array(plot_data["log_odds_ratio_upr"]))
+        log_odds_smooth = spl(strength_range)
+        log_odds_lwr_smooth = spl_lwr(strength_range)
+        log_odds_upr_smooth = spl_upr(strength_range)
+
+        axarr = f.add_subplot(3, 3, subplot_idx)
+
+        plt.scatter(plot_data["strength"],
+                    plot_data["log_odds_ratio"], color="grey", marker=".")
+        plt.plot(strength_range, log_odds_smooth, color="blue")
+        plt.fill_between(strength_range, log_odds_lwr_smooth,
+                         log_odds_upr_smooth, color='blue', alpha=.1)
+
+        plt.plot([0, 5], [0, 0], "k:")
+        plt.xlim(xmin, xmax)
+        plt.xticks([0, 1, 2, 3, 4, 5])
+        plt.ylim(ymin, ymax)
+
+    if plot_type == "FS":
+
+        # ylim = max(abs(ymin), abs(ymax))
+        strength_range = np.linspace(start=plot_data["strength"].min(),
+                                     stop=plot_data["strength"].max(),
+                                     num=300)
+
+        spl = make_smoothing_spline(np.array(plot_data["strength"]),
+                                    np.array(plot_data["FS_diff"]))
+        spl_lwr = make_smoothing_spline(np.array(plot_data["strength"]),
+                                        np.array(plot_data["FS_diff_lwr"]))
+        spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
+                                        np.array(plot_data["FS_diff_upr"]))
+        FS_smooth = spl(strength_range)
+        FS_lwr_smooth = spl_lwr(strength_range)
+        FS_upr_smooth = spl_upr(strength_range)
+
+        axarr = f.add_subplot(3, 3, subplot_idx)
+
+        plt.scatter(plot_data["strength"], plot_data["FS_diff"],
+                    color="grey", marker=".")
+        plt.plot(strength_range, FS_smooth, color="red")
+        plt.fill_between(strength_range, FS_lwr_smooth,
+                         FS_upr_smooth, color='red', alpha=.1)
+
+        plt.plot([-0.05, 5.05], [0, 0], "k:")
+
+        plt.xlim(xmin, xmax)
+        plt.xticks([0, 1, 2, 3, 4, 5])
+        plt.ylim(ymin, ymax)
+        plt.yticks([-0.2, 0, 0.2, 0.4])
+
+    if plot_type == "FS_conditional":
+
+        strength_range = np.linspace(start=plot_data["strength"].min(),
+                                     stop=plot_data["strength"].max(),
+                                     num=300)
+
+        spl = make_smoothing_spline(np.array(plot_data["strength"]),
+                                    np.array(plot_data["FS_conditional_diff"]))
+        spl_lwr = make_smoothing_spline(np.array(plot_data["strength"]),
+                                        np.array(plot_data["FS_conditional_diff_lwr"]))
+        spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
+                                        np.array(plot_data["FS_conditional_diff_upr"]))
+        FS_smooth = spl(strength_range)
+        FS_lwr_smooth = spl_lwr(strength_range)
+        FS_upr_smooth = spl_upr(strength_range)
+
+        axarr = f.add_subplot(3, 3, subplot_idx)
+
+        plt.scatter(plot_data["strength"],
+                    plot_data["FS_conditional_diff"], color="grey", marker=".")
+        plt.plot(strength_range, FS_smooth, color="red")
+        plt.fill_between(strength_range, FS_lwr_smooth,
+                         FS_upr_smooth, color='red', alpha=.1)
+
+        plt.plot([-0.05, 5.05], [0, 0], "k:")
+
+        plt.xlim(xmin, xmax)
+        plt.xticks([0, 1, 2, 3, 4, 5])
+        plt.ylim(ymin, ymax)
+        plt.yticks([-0.2, 0, 0.2, 0.4])
+
+
+# log-odds
+fig = plt.figure()
+
+ymin = df["log_odds_ratio_lwr"].min()
+ymax = df["log_odds_ratio_upr"].max()
+
+ylim = max(abs(ymin), abs(ymax))
+
+days = [5, 10, 15]
+targets = ["w1", "w2", "w3"]
+counter = 1
+
+for d in days:
+    for t in targets:
+        ax = create_plot(df, t, d,
+                         ymin=-ylim, ymax=ylim,
+                         f=fig, subplot_idx=counter)
+        counter += 1
+
+        if d == 5:
+            plt.title(t)
+
+        if t == "w3":
+            plt.text(5.5, (ylim + (-ylim))/2,  f"day {d}")
+
+        if (d == 10) & (t == "w1"):
+            plt.ylabel("Log-Odds ratio of major outbreak")
+        if (d == 15) & (t == "w2"):
+            plt.xlabel("Strength of intervention")
+
+
+plt.tight_layout()
+plt.savefig("../figs/results3_log_odds.png",
+            dpi=dpi,
+            bbox_inches="tight")
+plt.close()
+
+
+# FS
+fig = plt.figure()
+ymin = df["FS_diff"].min() - 0.1
+ymax = df["FS_diff"].max() + 0.1
+
+counter = 1
+
+for d in days:
+    for t in targets:
+        ax = create_plot(df, t, d, f=fig,
+                         ymin=ymin, ymax=ymax,
+                         subplot_idx=counter, plot_type="FS")
+        counter += 1
+
+        if d == 5:
+            plt.title(t)
+
+        if t == "w3":
+            plt.text(5.5, (ymin + ymax)/2, f"day {d}")
+
+        if (d == 10) & (t == "w1"):
+            plt.ylabel("Infections saved")
+        if (d == 15) & (t == "w2"):
+            plt.xlabel("Strength of intervention")
+
+
+plt.tight_layout()
+plt.savefig("../figs/results3_infections_saved.png",
+            dpi=dpi,
+            bbox_inches="tight")
+plt.close()
+
+
+# FS Conditional
+fig = plt.figure()
+ymin = df["FS_conditional_diff_lwr"].min()
+ymax = df["FS_conditional_diff_upr"].max()
+
+counter = 1
+
+for d in days:
+    for t in targets:
+        ax = create_plot(df, t, d,
+                         ymin=ymin, ymax=ymax,
+                         f=fig, subplot_idx=counter,
+                         plot_type="FS_conditional")
+        counter += 1
+
+        if d == 5:
+            plt.title(t)
+
+        if t == "w3":
+            plt.text(5.5, (ymin + ymax)/2, f"day {d}")
+
+        if (d == 10) & (t == "w1"):
+            plt.ylabel("Conditional Infections saved")
+        if (d == 15) & (t == "w2"):
+            plt.xlabel("Strength of intervention")
+
+
+plt.tight_layout()
+plt.savefig("../figs/results3_infections_saved_conditional.png",
+            dpi=dpi,
+            bbox_inches="tight")
+plt.close()
+
+# fig = plt.figure()
+# ax1 = fig.add_subplot(2, 2, 1)
+# ax1 = create_plot(df, "w1", 5)
+# ax2 = fig.add_subplot(2, 2, 2)
+# ax2 = create_plot(df, "w1", 10)
+# plt.show()

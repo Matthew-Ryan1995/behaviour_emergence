@@ -9,6 +9,7 @@ I shouldn't need to account for fear, cause this is all about early onset.
 @author: rya200
 """
 from BaD import *
+from bad_ctmc import get_w1
 import numpy as np
 from scipy.optimize import fsolve
 import gillespy2
@@ -19,23 +20,22 @@ start_time = datetime.now()
 
 # %%
 
-params = load_param_defaults()
 
 # %%
 # beta = params["transmission"]
 # beta = 2
 
-params["infectious_period"] = 5
-params["transmission"] = 3/params["infectious_period"]
-params["immune_period"] = 0
+# params["infectious_period"] = 7
+# params["transmission"] = 3/params["infectious_period"]
+# params["immune_period"] = 0
 
-params["B_fear"] = 8/params["infectious_period"]
-params["N_social"] = 0.4 / params["infectious_period"]
-params["B_const"] = 0.0 / params["infectious_period"]
-params["N_const"] = 0.6 / params["infectious_period"]
+# params["B_fear"] = 8/params["infectious_period"]
+# params["N_social"] = 0.4 / params["infectious_period"]
+# params["B_const"] = 0.01 / params["infectious_period"]
+# params["N_const"] = 0.6 / params["infectious_period"]
 
-params["B_social"] = (
-    1.1 * (params["N_social"] + params["N_const"]))
+# params["B_social"] = (
+#     0.2 * (params["N_social"] + params["N_const"]))
 
 # params["inf_B_efficacy"] = 0
 # params["susc_B_efficacy"] = 0
@@ -50,7 +50,38 @@ params["B_social"] = (
 # a1 = params["N_social"]
 # a2 = params["N_const"]
 
-P = 10000
+params = load_param_defaults()
+
+R0 = 3.28
+# R0B = 0.9
+B_star_min = 0.001
+infectious_period = 7
+
+
+# Load and alter parameters
+params = load_param_defaults()
+
+params["immune_period"] = 0  # No waning immunity
+
+params["infectious_period"] = infectious_period
+params["transmission"] = R0/params["infectious_period"]
+
+
+params["B_fear"] = 0  # params["B_fear"]/params["infectious_period"]
+# params["B_const"] = params["B_const"] / params["infectious_period"]
+
+params["N_social"] = 0  # params["N_social"] / params["infectious_period"]
+params["N_const"] = 0  # params["N_const"] / params["infectious_period"]
+
+params["B_const"] = B_star_min * params["N_const"] / (1-B_star_min)
+
+# params["B_social"] = (R0B * (params["N_social"] + params["N_const"]))
+
+Bstar = 0.03
+w1 = 0  # get_w1(Bstar, params)
+params["B_social"] = w1
+
+P = 1e4
 I0 = 1
 B0 = 1
 
@@ -60,12 +91,29 @@ M = bad(**params)
 
 Sn = P - I0 - B0
 IC = np.array([Sn, B0, I0, 0, 0, 0]) / P
-t_start, t_end = [0, 100]
+t_start, t_end = [0, 200]
 M.run(IC=IC, t_start=t_start, t_end=t_end)
 
 M.endemic_behaviour(I_eval=0)
-print(M.Nstar)
+print(1-M.Nstar)
+# print(params["B_const"]/(params["B_const"] + params["N_const"]))
 
+# %%
+
+a1 = params["N_social"]
+w3 = params["B_const"]
+
+k = a1 + w3 + params["N_const"]
+
+
+def solve_w1(x):
+    ans = ((1-2*Bstar)**2 - 1) * x**2 + (2*(2*Bstar*a1 - k)*(1-2*Bstar) -
+                                         (4*w3 - 2*k)) * x + ((2*Bstar*a1 - k)**2 - (k**2 - 4*a1*w3))
+    return ans
+
+
+w1 = fsolve(solve_w1, x0=[0, 1, 2, 10])
+# solve_w1(w1)
 
 # %%
 
@@ -208,7 +256,7 @@ def bad_ctmc(param_vals, P=100, I0=1, B0=1, t_end=100):
 # %%
 
 
-num_trajectory = 500
+num_trajectory = 1000
 
 # t_end = 300
 
@@ -219,61 +267,90 @@ results = model.run(number_of_trajectories=num_trajectory)
 print(f"Time taken: {datetime.now()-start_time}")
 
 # %%
-plt.figure()
-B_avg = np.zeros(101)
-B_med = np.zeros(101)
+# plt.figure()
+# B_avg = np.zeros(t_end + 1)
+# B_med = np.zeros(t_end + 1)
 
-n_count = 0
-for idx in range(num_trajectory):
-    trajectory = results[idx]
-    B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"]) / P
-    if B[-1] > 0.001:
-        B_avg += B
-        n_count += 1
-        B_med = np.column_stack((B_med, B))
-    I = (trajectory["Ib"] + trajectory["In"]) / P
-    plt.plot(trajectory["time"], B, color="blue", alpha=0.2)
-    plt.plot(trajectory["time"], I, color="red", alpha=0.2)
-tmp = early_behaviour_dynamics(M)
-tt = [i for i in range(len(tmp)) if tmp[i] < 1]
-plt.plot(range(tt[-1] + 1), tmp[tt], color="orange")
+# n_count = 0
+# for idx in range(num_trajectory):
+#     trajectory = results[idx]
+#     B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"]) / P
+#     if B[-1] > 0.001:
+#         B_avg += B
+#         n_count += 1
+#         B_med = np.column_stack((B_med, B))
+#     I = (trajectory["Ib"] + trajectory["In"]) / P
+#     plt.plot(trajectory["time"], B, color="blue", alpha=0.2)
+#     plt.plot(trajectory["time"], I, color="red", alpha=0.2)
+# tmp = early_behaviour_dynamics(M)
+# tt = [i for i in range(len(tmp)) if tmp[i] < 1]
+# plt.plot(range(tt[-1] + 1), tmp[tt], color="orange")
 
-tmp2 = early_behaviour_dynamics(M, method="poly", M=3)
-tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
-plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
-tmp2 = early_behaviour_dynamics(M, method="poly", M=2)
-tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
-plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
-tmp2 = early_behaviour_dynamics(M, method="poly", M=1)
-tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
-plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
-tmp2 = early_behaviour_dynamics(M, method="poly", M=4)
-tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
-plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
+# tmp2 = early_behaviour_dynamics(M, method="poly", M=3)
+# tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
+# # plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
+# # tmp2 = early_behaviour_dynamics(M, method="poly", M=2)
+# # tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
+# # plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
+# # tmp2 = early_behaviour_dynamics(M, method="poly", M=1)
+# # tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
+# # plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
+# # tmp2 = early_behaviour_dynamics(M, method="poly", M=4)
+# tt = [i for i in range(len(tmp2)) if tmp2[i] < 1]
+# plt.plot(range(tt[-1] + 1), tmp2[tt], color="black")
 
-B_avg /= n_count
-plt.plot(trajectory["time"], B_avg, color="grey")
+# B_avg /= n_count
+# plt.plot(trajectory["time"], B_avg, color="grey")
 
-B_med = B_med[:, 1:]
-B_med = np.median(B_med, axis=1)
-plt.plot(trajectory["time"], B_med, color="purple")
+# B_med = B_med[:, 1:]
+# B_med = np.median(B_med, axis=1)
+# plt.plot(trajectory["time"], B_med, color="purple")
 
-# R0 = M.Rzero()
-# f = (I0/P) * np.exp(((R0 - 1) /
-#                      params["infectious_period"]) * trajectory["time"])
-# tt2 = [i for i in range(len(tmp)) if f[i] < 1]
-# plt.plot(tt2, f[tt2],
-#          color="grey")
-plt.xlabel("time")
-plt.ylabel("Count")
-plt.legend(["Behaviour", "Infections"])
-plt.show()
+# # R0 = M.Rzero()
+# # f = (I0/P) * np.exp(((R0 - 1) /
+# #                      params["infectious_period"]) * trajectory["time"])
+# # tt2 = [i for i in range(len(tmp)) if f[i] < 1]
+# # plt.plot(tt2, f[tt2],
+# #          color="grey")
+# plt.xlabel("time")
+# plt.ylabel("Count")
+# plt.legend(["Behaviour", "Infections"])
+# plt.show()
 
 # %%
 count = 0
 for idx in range(num_trajectory):
     trajectory = results[idx]
     B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"])
-    if (P-B[-1]) > int(0.9*P):
+    I = trajectory["In"] + trajectory["Ib"]
+    if (max(I)) > int(0.001*P):
         count += 1
 print(count/num_trajectory)
+# count = 0
+# for idx in range(num_trajectory):
+#     trajectory = results[idx]
+#     B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"])
+#     if (P-B[-1]) > int(0.9*P):
+#         count += 1
+# print(count/num_trajectory)
+
+# %% Test for finished infections
+I_final = []
+for idx in range(num_trajectory):
+    trajectory = results[idx]
+    I = trajectory["In"] + trajectory["Ib"]
+    I_final.append(I[-1])
+
+plt.figure()
+plt.hist(I_final)
+plt.show()
+
+B_final = []
+for idx in range(num_trajectory):
+    trajectory = results[idx]
+    B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"])/P
+    B_final.append(B[-1])
+
+plt.figure()
+plt.hist(B_final)
+plt.show()

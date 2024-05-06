@@ -59,7 +59,7 @@ def load_intervention_data(file, file_path="../data/simulations/interventions/",
         outbreak_probability * (1-outbreak_probability) / n)
 
     # Final size
-    fs = np.array([x["I_total"][-1] for x in results])
+    fs = np.array([x["I_total"][-1] for x in results]) / P
 
     fs_mean = fs.mean()
 
@@ -67,7 +67,7 @@ def load_intervention_data(file, file_path="../data/simulations/interventions/",
 
     # FS when an outbreak occurs
     fs_conditional = np.array(
-        [x["I_total"][-1] for idx, x in enumerate(results) if outbreak_occurs[idx] > 0])
+        [x["I_total"][-1] for idx, x in enumerate(results) if outbreak_occurs[idx] > 0]) / P
     fs_conditional_mean = fs_conditional.mean()
 
     fs_conditional_std = fs_conditional.std()/np.sqrt(fs_conditional.size)
@@ -115,7 +115,7 @@ def load_baseline_data(file, file_path="../data/simulations/baseline/",
         outbreak_probability * (1-outbreak_probability) / n)
 
     # Final size
-    fs = np.array([x["I_total"][-1] for x in results])
+    fs = np.array([x["I_total"][-1] for x in results])/P
 
     fs_mean = fs.mean()
 
@@ -123,7 +123,7 @@ def load_baseline_data(file, file_path="../data/simulations/baseline/",
 
     # FS when an outbreak occurs
     fs_conditional = np.array(
-        [x["I_total"][-1] for idx, x in enumerate(results) if outbreak_occurs[idx] > 0])
+        [x["I_total"][-1] for idx, x in enumerate(results) if outbreak_occurs[idx] > 0])/P
     fs_conditional_mean = fs_conditional.mean()
 
     fs_conditional_std = fs_conditional.std()/np.sqrt(fs_conditional.size)
@@ -144,6 +144,8 @@ def load_baseline_data(file, file_path="../data/simulations/baseline/",
 # %% Load and save data
 df = list(map(load_intervention_data, filenames))
 df = pd.DataFrame(df)
+
+df = df.sort_values(by=["target", "day", "strength"])
 
 df.to_csv("../data/df_results3_intervention.csv")
 

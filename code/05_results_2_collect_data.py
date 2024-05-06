@@ -50,7 +50,7 @@ def load_bstar_data(file, file_path="../data/simulations/vary_Bstar/",
         outbreak_probability * (1-outbreak_probability) / outbreak_occurs.size)
 
     # Final size
-    fs = np.array([x["I_total"][-1] for x in results])
+    fs = np.array([x["I_total"][-1] for x in results])/P
 
     fs_mean = fs.mean()
 
@@ -58,7 +58,7 @@ def load_bstar_data(file, file_path="../data/simulations/vary_Bstar/",
 
     # FS when an outbreak occurs
     fs_conditional = np.array(
-        [x["I_total"][-1] for idx, x in enumerate(results) if outbreak_occurs[idx] > 0])
+        [x["I_total"][-1] for idx, x in enumerate(results) if outbreak_occurs[idx] > 0])/P
     fs_conditional_mean = fs_conditional.mean()
 
     fs_conditional_std = fs_conditional.std()/np.sqrt(fs_conditional.size)
@@ -81,5 +81,7 @@ def load_bstar_data(file, file_path="../data/simulations/vary_Bstar/",
 # %% Load and save data
 df = list(map(load_bstar_data, filenames))
 df = pd.DataFrame(df)
+
+df = df.sort_values(by="Bstar")
 
 df.to_csv("../data/df_results2_varyBstar.csv")

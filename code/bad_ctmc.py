@@ -60,17 +60,20 @@ def bad_ctmc(param_vals: dict, P: int = 100, I0: int = 1, B0: int = 1, t_end: in
     gamma = gillespy2.Parameter(
         name="gamma", expression=1/param_vals["infectious_period"])
     beta_nn = gillespy2.Parameter(
-        name="beta_nn", expression=param_vals["transmission"] / P)
+        name="beta_nn", expression=param_vals["transmission"] / (P-1))
     beta_nb = gillespy2.Parameter(name="beta_nb", expression=(
-        1 - param_vals["susc_B_efficacy"]) * param_vals["transmission"] / P)
+        1 - param_vals["susc_B_efficacy"]) * param_vals["transmission"] / (P-1))
     beta_bn = gillespy2.Parameter(name="beta_bn", expression=(
-        1 - param_vals["inf_B_efficacy"]) * param_vals["transmission"] / P)
+        1 - param_vals["inf_B_efficacy"]) * param_vals["transmission"] / (P-1))
     beta_bb = gillespy2.Parameter(name="beta_bb", expression=(
-        1 - param_vals["inf_B_efficacy"]) * (1 - param_vals["susc_B_efficacy"]) * param_vals["transmission"] / P)
-    w1 = gillespy2.Parameter(name="w1", expression=param_vals["B_social"] / P)
-    w2 = gillespy2.Parameter(name="w2", expression=param_vals["B_fear"] / P)
+        1 - param_vals["inf_B_efficacy"]) * (1 - param_vals["susc_B_efficacy"]) * param_vals["transmission"] / (P-1))
+    w1 = gillespy2.Parameter(
+        name="w1", expression=param_vals["B_social"] / (P-1))
+    w2 = gillespy2.Parameter(
+        name="w2", expression=param_vals["B_fear"] / (P-1))
     w3 = gillespy2.Parameter(name="w3", expression=param_vals["B_const"])
-    a1 = gillespy2.Parameter(name="a1", expression=param_vals["N_social"] / P)
+    a1 = gillespy2.Parameter(
+        name="a1", expression=param_vals["N_social"] / (P-1))
     a2 = gillespy2.Parameter(name="a2", expression=param_vals["N_const"])
 
     model.add_parameter([gamma, beta_nn, beta_nb, beta_bn, beta_bb,
@@ -279,10 +282,10 @@ def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=0.001):
         1 if outbreak occured, 0 else.
 
     """
-    I = dlr["In"] + dlr["Ib"]
+    I = dlr["I_total"]
 
     ans = 0
-    if I.max() > int(outbreak_definition*P):
+    if I[-1] > int(20):
         ans = 1
 
     return ans
@@ -400,6 +403,3 @@ if __name__ == "__main__":
     plt.xlabel("Final size")
     plt.ylabel("Frequency")
     plt.show()
-    
-    
-    

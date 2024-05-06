@@ -26,6 +26,10 @@ with open(file_path + filenames[0], "r") as f:
 f.close()
 
 results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
+# %% Plot parameters
+
+dpi = 600
+
 # %% Set up parameters
 
 P = simulation_parameters["P"]
@@ -49,7 +53,9 @@ plt.figure()
 for idx in range(num_trajectory):
     trajectory = results[idx]
     B = (trajectory["Sb"] + trajectory["Ib"] + trajectory["Rb"]) / P
+    I = (trajectory["In"] + trajectory["Ib"]) / P
     plt.plot(trajectory["time"], B, color="blue", alpha=0.2)
+    plt.plot(trajectory["time"], I, color="red", alpha=0.2)
 
 # Plot/demonstrate early time approximations
 exp_approx = early_behaviour_dynamics(M)
@@ -64,19 +70,23 @@ plt.plot(range(tt[-1] + 1), cubic_approx[tt],
 
 no_I_approx = early_behaviour_dynamics(M, method="none")
 tt = [i for i in range(len(no_I_approx)) if no_I_approx[i] < 1]
-plt.plot(range(tt[-1] + 1), no_I_approx[tt], color="red")
+plt.plot(range(tt[-1] + 1), no_I_approx[tt], color="black")
 
-plt.xlabel("time")
-plt.ylabel("Proportion")
-plt.legend(["Behaviour"])
-plt.title("Dashed line - exponential\nDotted line - Cubic")
-plt.show()
+plt.xlabel("time (days)")
+plt.ylabel("Prevalence")
+# plt.legend(["Behaviour", "Infection"])
+# plt.title("Dashed line - exponential\nDotted line - Cubic")
+plt.savefig("../figs/results1_timeseries.png",
+            dpi=dpi,
+            bbox_inches="tight")
+plt.close()
 
 # todo: Add save
 
 # %% Figure 2: Snapshot at day 10
 
 snapshot_day = 10 - 1
+y_coord = 10
 
 B_snapshot = []
 I_snapshot = []
@@ -94,20 +104,45 @@ cubic_approx = early_behaviour_dynamics(M, method="poly", M=3)
 
 
 plt.figure()
-plt.hist(B_snapshot, bins=len(B_snapshot))
-plt.plot([exp_approx[snapshot_day], exp_approx[snapshot_day]],
-         [1, 1], "x", color="red")
-plt.plot([cubic_approx[snapshot_day], cubic_approx[snapshot_day]],
-         [1, 1], "x", color="black")
-plt.plot([no_I_approx[snapshot_day], no_I_approx[snapshot_day]],
-         [1, 1], "x", color="purple")
-plt.xlabel("Proportion doing behaviour")
-plt.ylabel("Frequency")
-plt.show()
+plt.hist(B_snapshot, bins=30,
+         edgecolor="black", color="white")
 
+plt.plot([exp_approx[snapshot_day], exp_approx[snapshot_day]],
+         [y_coord, y_coord], "x", color="black")
+plt.plot([exp_approx[snapshot_day], exp_approx[snapshot_day]],
+         [0, y_coord], linestyle="dashed", color="black", linewidth=3)
+
+plt.plot([cubic_approx[snapshot_day], cubic_approx[snapshot_day]],
+         [y_coord, y_coord], "D", color="black")
+plt.plot([cubic_approx[snapshot_day], cubic_approx[snapshot_day]],
+         [0, y_coord], linestyle="dashed", color="black", linewidth=3)
+
+plt.plot([no_I_approx[snapshot_day], no_I_approx[snapshot_day]],
+         [y_coord, y_coord], "*", color="black")
+plt.plot([no_I_approx[snapshot_day], no_I_approx[snapshot_day]],
+         [0, y_coord], linestyle="dashed", color="black", linewidth=3)
+
+plt.xlabel(f"Prevalence of behaviour on day {snapshot_day + 1}")
+plt.ylabel("Frequency")
+plt.savefig("../figs/results1_behaviour_snapshot.png",
+            dpi=dpi,
+            bbox_inches="tight")
+plt.close()
+
+
+# plt.figure()
+# plt.hist(I_snapshot, bins=len(I_snapshot))
+# plt.xlabel("Proportion infected to ate")
+# plt.ylabel("Frequency")
+# plt.show()
+# %%
+
+fs = []
+for idx in range(num_trajectory):
+    trajectory = results[idx]
+    I = (trajectory["I_total"])
+    fs.append(I[-1])
 
 plt.figure()
-plt.hist(I_snapshot, bins=len(I_snapshot))
-plt.xlabel("Proportion infected to ate")
-plt.ylabel("Frequency")
+plt.hist(fs, bins=100)
 plt.show()

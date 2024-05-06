@@ -66,7 +66,12 @@ def run_simulation_with_event(Bstar,
 
     B0 = int(Bstar * simulation_parameters["P"]) - simulation_parameters["I0"]
 
-    model = bad_ctmc(param_vals=simulation_parameters["params"],
+    # Make Bstar the steady state
+    tmp_params = dict(simulation_parameters["params"])
+    w1 = get_w1(Bstar, tmp_params)
+    tmp_params["B_social"] = w1
+
+    model = bad_ctmc(param_vals=tmp_params,
                      P=simulation_parameters["P"],
                      I0=simulation_parameters["I0"],
                      B0=B0,
@@ -88,12 +93,13 @@ def run_simulation_with_event(Bstar,
 
 if __name__ == '__main__':
 
-    Bstar_min = 0.05
-    Bstar_max = 1
-    Bstar_step = 0.05
+    Bstar_min = 0.01
+    Bstar_max = 0.98
+    Bstar_step = 0.01
 
-    Bstar = np.arange(start=Bstar_min, stop=Bstar_max +
-                      Bstar_step, step=Bstar_step)
+    Bstar = np.arange(start=Bstar_min,
+                      stop=Bstar_max,  # Code freaks out when we move past 0.98
+                      step=Bstar_step)
 
     with multiprocessing.Pool(6) as p:
         p.map(run_simulation_with_event, Bstar)

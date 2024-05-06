@@ -66,11 +66,14 @@ def run_simulation_with_event(inter_scenario,
     if os.path.exists(save_file):
         return "Done"
 
-    event = {
-        "strength": strength,
-        "target": target,
-        "day": day
-    }
+    if strength == 1:
+        event = {}
+    else:
+        event = {
+            "strength": strength,
+            "target": target,
+            "day": day
+        }
 
     model = bad_ctmc(param_vals=simulation_parameters["params"],
                      P=simulation_parameters["P"],
