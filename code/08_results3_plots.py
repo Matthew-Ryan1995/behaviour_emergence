@@ -11,8 +11,17 @@ todo: Improve standard error calculation of FS now that I am using proportions
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+# import seaborn as sns
 from scipy.interpolate import make_smoothing_spline
+
+params = {"ytick.color": "black",
+          "xtick.color": "black",
+          "axes.labelcolor": "black",
+          "axes.edgecolor": "black",
+          # "text.usetex": True,
+          "font.family": "serif"}
+plt.rcParams.update(params)
+plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 
 # %%
 
@@ -25,6 +34,8 @@ df_baseline = pd.read_csv(file_path_baseline, index_col=0)
 # %% Plot parameters
 
 dpi = 600
+font_size = 16
+
 # %% Create new vars
 
 df["log_odds_ratio"] = np.log((df["pHat"]/(1-df["pHat"])) /
@@ -36,16 +47,32 @@ df["log_odds_ratio_se"] = np.sqrt((1/df["num_trajectories"]) * (1/(df["pHat"]*(
 df["log_odds_ratio_lwr"] = df["log_odds_ratio"] - 1.96*df["log_odds_ratio_se"]
 df["log_odds_ratio_upr"] = df["log_odds_ratio"] + 1.96*df["log_odds_ratio_se"]
 
-df["FS_diff"] = df_baseline["FS_avg"].iloc[0] - df["FS_avg"]
-df["FS_diff_se"] = np.sqrt(df_baseline["FS_std"].iloc[0]**2 + df["FS_std"]**2)
+# df["log_odds_ratio"] = np.exp(df["log_odds_ratio"])
+# df["log_odds_ratio_lwr"] = np.exp(df["log_odds_ratio_lwr"])
+# df["log_odds_ratio_upr"] = np.exp(df["log_odds_ratio_upr"])
+
+df["FS_diff"] = (df_baseline["FS_avg"].iloc[0] - df["FS_avg"]
+                 ) / df_baseline["FS_avg"].iloc[0]
+# df["FS_diff_se"] = np.sqrt(df_baseline["FS_std"].iloc[0]**2 + df["FS_std"]**2)
+# SE calculated using Eqn 10 of https://link.springer.com/content/pdf/10.3758/BF03201412.pdf
+df["FS_diff_se"] = np.sqrt(
+    df["FS_std"]**2 + (df["FS_avg"] / df_baseline["FS_avg"].iloc[0]
+                       ) ** 2 * df_baseline["FS_std"].iloc[0]**2
+) / df_baseline["FS_avg"].iloc[0]
 
 df["FS_diff_lwr"] = df["FS_diff"] - 1.96 * df["FS_diff_se"]
 df["FS_diff_upr"] = df["FS_diff"] + 1.96 * df["FS_diff_se"]
 
-df["FS_conditional_diff"] = df_baseline["FS_conditional"].iloc[0] - \
-    df["FS_conditional"]
+df["FS_conditional_diff"] = (df_baseline["FS_conditional"].iloc[0] - df["FS_conditional"]
+                             ) / df_baseline["FS_conditional"].iloc[0]
+
+# df["FS_conditional_diff_se"] = np.sqrt(
+#     df_baseline["FS_conditional_std"].iloc[0]**2 + df["FS_conditional_std"]**2)
+
 df["FS_conditional_diff_se"] = np.sqrt(
-    df_baseline["FS_conditional_std"].iloc[0]**2 + df["FS_conditional_std"]**2)
+    df["FS_conditional_std"]**2 + (df["FS_conditional"] / df_baseline["FS_conditional"].iloc[0]
+                                   ) ** 2 * df_baseline["FS_conditional_std"].iloc[0]**2
+) / df_baseline["FS_conditional"].iloc[0]
 
 df["FS_conditional_diff_lwr"] = df["FS_conditional_diff"] - \
     1.96 * df["FS_conditional_diff_se"]
@@ -224,8 +251,9 @@ def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="l
 
         plt.plot([0, 5], [0, 0], "k:")
         plt.xlim(xmin, xmax)
-        plt.xticks([0, 1, 2, 3, 4, 5])
+        plt.xticks([0, 1, 2, 3, 4, 5], fontsize=font_size)
         plt.ylim(ymin, ymax)
+        plt.yticks(fontsize=font_size)
 
     if plot_type == "FS":
 
@@ -240,13 +268,13 @@ def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="l
                                         np.array(plot_data["FS_diff_lwr"]))
         spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
                                         np.array(plot_data["FS_diff_upr"]))
-        FS_smooth = spl(strength_range)
-        FS_lwr_smooth = spl_lwr(strength_range)
-        FS_upr_smooth = spl_upr(strength_range)
+        FS_smooth = spl(strength_range) * 100
+        FS_lwr_smooth = spl_lwr(strength_range) * 100
+        FS_upr_smooth = spl_upr(strength_range) * 100
 
         axarr = f.add_subplot(3, 3, subplot_idx)
 
-        plt.scatter(plot_data["strength"], plot_data["FS_diff"],
+        plt.scatter(plot_data["strength"], plot_data["FS_diff"] * 100,
                     color="grey", marker=".")
         plt.plot(strength_range, FS_smooth, color="red")
         plt.fill_between(strength_range, FS_lwr_smooth,
@@ -255,9 +283,10 @@ def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="l
         plt.plot([-0.05, 5.05], [0, 0], "k:")
 
         plt.xlim(xmin, xmax)
-        plt.xticks([0, 1, 2, 3, 4, 5])
-        plt.ylim(ymin, ymax)
-        plt.yticks([-0.2, 0, 0.2, 0.4])
+        plt.xticks([0, 1, 2, 3, 4, 5], fontsize=font_size)
+        plt.ylim(ymin*100, ymax*100)
+        # plt.yticks(np.array([-0.2, 0, 0.2, 0.4])*100)
+        plt.yticks([-50,  0, 50, 100], fontsize=font_size)
 
     if plot_type == "FS_conditional":
 
@@ -271,14 +300,14 @@ def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="l
                                         np.array(plot_data["FS_conditional_diff_lwr"]))
         spl_upr = make_smoothing_spline(np.array(plot_data["strength"]),
                                         np.array(plot_data["FS_conditional_diff_upr"]))
-        FS_smooth = spl(strength_range)
-        FS_lwr_smooth = spl_lwr(strength_range)
-        FS_upr_smooth = spl_upr(strength_range)
+        FS_smooth = spl(strength_range) * 100
+        FS_lwr_smooth = spl_lwr(strength_range) * 100
+        FS_upr_smooth = spl_upr(strength_range) * 100
 
         axarr = f.add_subplot(3, 3, subplot_idx)
 
         plt.scatter(plot_data["strength"],
-                    plot_data["FS_conditional_diff"], color="grey", marker=".")
+                    plot_data["FS_conditional_diff"] * 100, color="grey", marker=".")
         plt.plot(strength_range, FS_smooth, color="red")
         plt.fill_between(strength_range, FS_lwr_smooth,
                          FS_upr_smooth, color='red', alpha=.1)
@@ -286,9 +315,10 @@ def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="l
         plt.plot([-0.05, 5.05], [0, 0], "k:")
 
         plt.xlim(xmin, xmax)
-        plt.xticks([0, 1, 2, 3, 4, 5])
-        plt.ylim(ymin, ymax)
-        plt.yticks([-0.2, 0, 0.2, 0.4])
+        plt.xticks([0, 1, 2, 3, 4, 5], fontsize=font_size)
+        plt.ylim(ymin*100, ymax*100)
+        # plt.yticks(np.array([-0.2, 0, 0.2, 0.4])*100)
+        plt.yticks([-50,  0, 50, 100], fontsize=font_size)
 
 
 # log-odds
@@ -311,15 +341,15 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(t)
+            plt.title(t, fontsize=font_size)
 
         if t == "w3":
-            plt.text(5.5, (ylim + (-ylim))/2,  f"day {d}")
+            plt.text(5.5, (ylim + (-ylim))/2,  f"day {d}", fontsize=font_size)
 
         if (d == 10) & (t == "w1"):
-            plt.ylabel("Log-Odds ratio of major outbreak")
+            plt.ylabel("Log-Odds ratio of outbreak", fontsize=font_size)
         if (d == 15) & (t == "w2"):
-            plt.xlabel("Strength of intervention")
+            plt.xlabel("Strength of intervention", fontsize=font_size)
 
 
 plt.tight_layout()
@@ -328,7 +358,7 @@ plt.savefig("../figs/results3_log_odds.png",
             bbox_inches="tight")
 plt.close()
 
-
+# %%
 # FS
 fig = plt.figure()
 ymin = df["FS_diff"].min() - 0.1
@@ -344,15 +374,15 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(t)
+            plt.title(t, fontsize=font_size)
 
         if t == "w3":
-            plt.text(5.5, (ymin + ymax)/2, f"day {d}")
+            plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)
 
         if (d == 10) & (t == "w1"):
-            plt.ylabel("Infections saved")
+            plt.ylabel("Infections saved (%)", fontsize=font_size)
         if (d == 15) & (t == "w2"):
-            plt.xlabel("Strength of intervention")
+            plt.xlabel("Strength of intervention", fontsize=font_size)
 
 
 plt.tight_layout()
@@ -361,7 +391,7 @@ plt.savefig("../figs/results3_infections_saved.png",
             bbox_inches="tight")
 plt.close()
 
-
+# %%
 # FS Conditional
 fig = plt.figure()
 ymin = df["FS_conditional_diff_lwr"].min()
@@ -378,15 +408,15 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(t)
+            plt.title(t, fontsize=font_size)
 
         if t == "w3":
-            plt.text(5.5, (ymin + ymax)/2, f"day {d}")
+            plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)
 
         if (d == 10) & (t == "w1"):
-            plt.ylabel("Conditional Infections saved")
+            plt.ylabel("Conditional Infections saved", fontsize=font_size)
         if (d == 15) & (t == "w2"):
-            plt.xlabel("Strength of intervention")
+            plt.xlabel("Strength of intervention", fontsize=font_size)
 
 
 plt.tight_layout()

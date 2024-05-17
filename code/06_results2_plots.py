@@ -14,6 +14,15 @@ import numpy as np
 # import seaborn as sns
 from scipy.interpolate import make_smoothing_spline
 
+params = {"ytick.color": "black",
+          "xtick.color": "black",
+          "axes.labelcolor": "black",
+          "axes.edgecolor": "black",
+          # "text.usetex": True,
+          "font.family": "serif"}
+plt.rcParams.update(params)
+plt.rcParams['mathtext.fontset'] = 'dejavuserif'
+
 # %% Load data
 file_path = "../data/df_results2_varyBstar.csv"
 df = pd.read_csv(file_path, index_col=0)
@@ -32,6 +41,7 @@ df["FS_conditional_upr"] = df["FS_conditional"] + \
 # %% Plot parameters
 
 dpi = 600
+font_size = 16
 
 # %% Figure 1: Outbreak Probability over time
 # df = df.sort_values(by="Bstar")
@@ -62,12 +72,24 @@ plt.plot(B_range, pHat_smooth, color="blue")
 plt.fill_between(B_range, pHat_lwr_smooth,
                  pHat_upr_smooth, color='blue', alpha=.1)
 
-plt.xlabel("Infection-free steady state of behaviour")
-plt.ylabel("Probability of infection outbreak")
+plt.xlabel("Infection-free steady state of behaviour ($B^*$)",
+           fontsize=font_size)
+plt.ylabel("Probability of outbreak", fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
+
 plt.savefig("../figs/results2_outbreak_prob_by_Bstar.png",
             dpi=dpi,
             bbox_inches="tight")
 plt.close()
+
+tmp = next(idx for idx in range(300) if B_range[idx] > 0.5)
+print("Outbreak prob when behaviour is 0%")
+print(
+    f"{pHat_smooth[0].round(3)}, 95% CI [{pHat_lwr_smooth[0].round(3)}, {pHat_upr_smooth[0].round(3)}]")
+print("Outbreak prob when behaviour is 50%")
+print(
+    f"{pHat_smooth[tmp].round(3)}, 95% CI [{pHat_lwr_smooth[tmp].round(3)}, {pHat_upr_smooth[tmp].round(3)}]")
 
 # %% Figure 2: Final size
 
@@ -78,9 +100,9 @@ spl_lwr = make_smoothing_spline(np.array(df["Bstar"]),
                                 np.array(df["FS_lwr"]))
 spl_upr = make_smoothing_spline(np.array(df["Bstar"]),
                                 np.array(df["FS_upr"]))
-FS_smooth = spl(B_range)
-FS_lwr_smooth = spl_lwr(B_range)
-FS_upr_smooth = spl_upr(B_range)
+FS_smooth = spl(B_range) * 100
+FS_lwr_smooth = spl_lwr(B_range) * 100
+FS_upr_smooth = spl_upr(B_range) * 100
 
 
 fig = plt.figure()
@@ -94,17 +116,28 @@ fig = plt.figure()
 # plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
 #                  line[2].get_ydata(), color='red', alpha=.1)
 
-plt.scatter(df["Bstar"], df["FS_avg"], color="grey", marker=".")
+plt.scatter(df["Bstar"], df["FS_avg"]*100, color="grey", marker=".")
 plt.plot(B_range, FS_smooth, color="red")
 plt.fill_between(B_range, FS_lwr_smooth,
                  FS_upr_smooth, color='red', alpha=.1)
 
-plt.xlabel("Infection-free steady state of behaviour")
-plt.ylabel("Expected final size")
+plt.xlabel("Infection-free steady state of behaviour", fontsize=font_size)
+plt.ylabel("Expected final size (%)", fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
+
 plt.savefig("../figs/results2_FS_by_Bstar.png",
             dpi=dpi,
             bbox_inches="tight")
 plt.close()
+
+# tmp = next(idx for idx in range(300) if B_range[idx] > 0.5)
+# print("Outbreak prob when behaviour is 0%")
+# print(
+#     f"{FS_smooth[0].round(1)}, 95% CI [{FS_lwr_smooth[0].round(1)}, {FS_upr_smooth[0].round(1)}]")
+# print("Outbreak prob when behaviour is 50%")
+# print(
+#     f"{FS_smooth[tmp].round(1)}, 95% CI [{FS_lwr_smooth[tmp].round(1)}, {FS_upr_smooth[tmp].round(1)}]")
 
 
 # %% Figure 3: Conditional Final size
@@ -117,9 +150,9 @@ spl_lwr = make_smoothing_spline(np.array(df["Bstar"]),
                                 np.array(df["FS_conditional_lwr"]))
 spl_upr = make_smoothing_spline(np.array(df["Bstar"]),
                                 np.array(df["FS_conditional_upr"]))
-FS_smooth = spl(B_range)
-FS_lwr_smooth = spl_lwr(B_range)
-FS_upr_smooth = spl_upr(B_range)
+FS_smooth = spl(B_range) * 100
+FS_lwr_smooth = spl_lwr(B_range) * 100
+FS_upr_smooth = spl_upr(B_range) * 100
 
 
 fig = plt.figure()
@@ -133,17 +166,30 @@ fig = plt.figure()
 # plt.fill_between(line[0].get_xdata(), line[1].get_ydata(),
 #                  line[2].get_ydata(), color='red', alpha=.1)
 
-plt.scatter(df["Bstar"], df["FS_conditional"], color="grey", marker=".")
+plt.scatter(df["Bstar"], df["FS_conditional"] * 100, color="grey", marker=".")
 plt.plot(B_range, FS_smooth, color="red")
 plt.fill_between(B_range, FS_lwr_smooth,
                  FS_upr_smooth, color='red', alpha=.1)
 
-plt.xlabel("Infection-free steady state of behaviour")
-plt.ylabel("Conditional Average final size of simulations")
+plt.xlabel("Infection-free steady state of behaviour ($B^*$)",
+           fontsize=font_size)
+plt.ylabel("Expected final size (%)", fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
+
 plt.savefig("../figs/results2_conditional_FS_by_Bstar.png",
             dpi=dpi,
             bbox_inches="tight")
 plt.close()
+
+
+tmp = next(idx for idx in range(300) if B_range[idx] > 0.5)
+print("FS when behaviour is 0%")
+print(
+    f"{FS_smooth[0].round(1)}, 95% CI [{FS_lwr_smooth[0].round(1)}, {FS_upr_smooth[0].round(1)}]")
+print("FS when behaviour is 50%")
+print(
+    f"{FS_smooth[tmp].round(1)}, 95% CI [{FS_lwr_smooth[tmp].round(1)}, {FS_upr_smooth[tmp].round(1)}]")
 
 
 # %%

@@ -19,6 +19,8 @@ from BaD import load_param_defaults
 from bad_ctmc import get_w1
 import json
 import numpy as np
+from scipy.optimize import fsolve
+import matplotlib.pyplot as plt
 
 # %%
 
@@ -54,6 +56,24 @@ w1 = get_w1(Bstar, params)
 params["B_social"] = w1
 
 
+# Calculate p and c
+
+params["inf_B_efficacy"] = 0.75
+
+gamma = 1/params["infectious_period"]
+beta = params["transmission"]
+
+pi = beta/(beta + gamma)
+
+k = 0.22
+A = k/(1-(1-k)*pi) - 1
+
+p = params["inf_B_efficacy"]
+
+c = 1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A)))
+
+params["susc_B_efficacy"] = c
+
 # Set up initial conditions
 P = 5000  # population size, chosen for speed of simulations
 I0 = 1  # Initial infected
@@ -84,9 +104,10 @@ f.close()
 
 int_start = 0
 int_stop = 5
-int_step = 0.2  # Change to get finer grain
+int_step = 0.1  # Change to get finer grain
 
-strength = np.arange(start=int_start, stop=int_stop + int_step, step=int_step)
+strength = np.arange(start=int_start, stop=int_stop +
+                     int_step, step=int_step).round(2)
 target = ["w1", "w2", "w3"]
 day = [5, 10, 15]
 
@@ -95,3 +116,30 @@ int_params = [(x, y, z) for x in target for y in day for z in strength]
 with open("../data/intervention_parameters.json", "w") as f:
     json.dump(int_params, f)
 f.close()
+
+# %%
+
+# beta = params["transmission"]
+# gamma = 1/params["infectious_period"]
+
+# pi = beta/(beta + gamma)
+# plt.figure()
+
+# kk = np.arange(0.02, 0.24, step = 0.02)
+# for k in kk:
+#     k=k.round(2)
+#     A = k/(1-(1-k)*pi) - 1
+
+#     p = np.arange(0, 1, step=0.01)
+
+#     c = 1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A)))
+
+#     idx = next(i for i, cc in enumerate(c) if cc < 0)
+
+
+#     plt.plot(p[:idx], c[:idx], label="k: " +str(k))
+# plt.xlabel("p")
+# plt.ylabel("c")
+# plt.plot([0.9, 0.9], [0, 1], ":k")
+# plt.legend(loc=(1.1, 0.))
+# plt.show()

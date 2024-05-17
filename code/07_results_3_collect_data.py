@@ -37,6 +37,17 @@ baseline_files = next(os.walk(baseline_path), (None, None, []))[2]
 if ".DS_Store" in baseline_files:
     baseline_files.remove(".DS_Store")
 
+# %%
+num_trajectories = 100
+
+target_file = f"trajectories_{num_trajectories}.json"
+
+filenames = [f for idx, f in enumerate(filenames) if target_file in f]
+baseline_files = [f for idx, f in enumerate(
+    baseline_files) if target_file in f]
+
+# filenames = filenames[ids]
+
 # %% Helper functions
 
 

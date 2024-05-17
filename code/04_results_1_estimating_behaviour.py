@@ -12,6 +12,15 @@ import os
 from BaD import *
 import matplotlib.pyplot as plt
 
+params = {"ytick.color": "black",
+          "xtick.color": "black",
+          "axes.labelcolor": "black",
+          "axes.edgecolor": "black",
+          # "text.usetex": True,
+          "font.family": "serif"}
+plt.rcParams.update(params)
+plt.rcParams['mathtext.fontset'] = 'dejavuserif'
+
 # %% Get and laod data
 file_path = "../data/simulations/baseline/"
 
@@ -29,6 +38,7 @@ results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
 # %% Plot parameters
 
 dpi = 600
+font_size = 16
 
 # %% Set up parameters
 
@@ -61,19 +71,22 @@ for idx in range(num_trajectory):
 exp_approx = early_behaviour_dynamics(M)
 tt = [i for i in range(len(exp_approx)) if exp_approx[i] < 1]
 plt.plot(range(tt[-1] + 1), exp_approx[tt],
-         linestyle="dashed", color="black")
+         linestyle="dashed", color="black", linewidth=3)
 
 cubic_approx = early_behaviour_dynamics(M, method="poly", M=3)
 tt = [i for i in range(len(cubic_approx)) if cubic_approx[i] < 1]
 plt.plot(range(tt[-1] + 1), cubic_approx[tt],
-         linestyle="dotted", color="black")
+         linestyle="dotted", color="black",  linewidth=3)
 
 no_I_approx = early_behaviour_dynamics(M, method="none")
 tt = [i for i in range(len(no_I_approx)) if no_I_approx[i] < 1]
-plt.plot(range(tt[-1] + 1), no_I_approx[tt], color="black")
+plt.plot(range(tt[-1] + 1), no_I_approx[tt],
+         linestyle="dashdot", color="black",  linewidth=3)
 
-plt.xlabel("time (days)")
-plt.ylabel("Prevalence")
+plt.xlabel("time (days)", fontsize=font_size)
+plt.ylabel("Prevalence", fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
 # plt.legend(["Behaviour", "Infection"])
 # plt.title("Dashed line - exponential\nDotted line - Cubic")
 plt.savefig("../figs/results1_timeseries.png",
@@ -87,6 +100,9 @@ plt.close()
 
 snapshot_day = 10 - 1
 y_coord = 10
+
+marker_size = 10
+linewidth = 3
 
 B_snapshot = []
 I_snapshot = []
@@ -108,22 +124,31 @@ plt.hist(B_snapshot, bins=30,
          edgecolor="black", color="white")
 
 plt.plot([exp_approx[snapshot_day], exp_approx[snapshot_day]],
-         [y_coord, y_coord], "x", color="black")
+         [y_coord, y_coord], "x", color="black", markersize=marker_size)
 plt.plot([exp_approx[snapshot_day], exp_approx[snapshot_day]],
-         [0, y_coord], linestyle="dashed", color="black", linewidth=3)
+         [0, y_coord], linestyle="dashed", color="black", linewidth=linewidth,
+         label="exponential")
 
 plt.plot([cubic_approx[snapshot_day], cubic_approx[snapshot_day]],
-         [y_coord, y_coord], "D", color="black")
+         [y_coord, y_coord], "D", color="black",  markersize=marker_size)
 plt.plot([cubic_approx[snapshot_day], cubic_approx[snapshot_day]],
-         [0, y_coord], linestyle="dashed", color="black", linewidth=3)
+         [0, y_coord], linestyle="dotted", color="black", linewidth=linewidth,
+         label="cubic")
 
 plt.plot([no_I_approx[snapshot_day], no_I_approx[snapshot_day]],
-         [y_coord, y_coord], "*", color="black")
+         [y_coord, y_coord], "*", color="black",  markersize=marker_size)
 plt.plot([no_I_approx[snapshot_day], no_I_approx[snapshot_day]],
-         [0, y_coord], linestyle="dashed", color="black", linewidth=3)
+         [0, y_coord], linestyle="dashdot", color="black", linewidth=linewidth,
+         label="no infection")
 
-plt.xlabel(f"Prevalence of behaviour on day {snapshot_day + 1}")
-plt.ylabel("Frequency")
+plt.xlabel(
+    f"Prevalence of behaviour on day {snapshot_day + 1}", fontsize=font_size)
+plt.ylabel("Frequency", fontsize=font_size)
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
+
+plt.legend()
+
 plt.savefig("../figs/results1_behaviour_snapshot.png",
             dpi=dpi,
             bbox_inches="tight")
@@ -137,12 +162,12 @@ plt.close()
 # plt.show()
 # %%
 
-fs = []
-for idx in range(num_trajectory):
-    trajectory = results[idx]
-    I = (trajectory["I_total"])
-    fs.append(I[-1])
+# fs = []
+# for idx in range(num_trajectory):
+#     trajectory = results[idx]
+#     I = (trajectory["I_total"])
+#     fs.append(I[-1])
 
-plt.figure()
-plt.hist(fs, bins=100)
-plt.show()
+# plt.figure()
+# plt.hist(fs, bins=100)
+# plt.show()
