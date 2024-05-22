@@ -68,11 +68,17 @@ pi = beta/(beta + gamma)
 k = 0.22
 A = k/(1-(1-k)*pi) - 1
 
-p = params["inf_B_efficacy"]
+c_min = 0.1
+
+# p = params["inf_B_efficacy"]
+p = np.arange(0, 1, step=0.01)
 
 c = 1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A)))
 
-params["susc_B_efficacy"] = c
+idx = next(i for i, cc in enumerate(c) if cc < c_min)
+
+params["susc_B_efficacy"] = c[idx - 1]
+params["inf_B_efficacy"] = p[idx - 1]
 
 # Set up initial conditions
 P = 5000  # population size, chosen for speed of simulations
@@ -95,6 +101,7 @@ simulation_parameters["B0"] = B0
 simulation_parameters["num_trajectory"] = num_trajectory
 simulation_parameters["t_end"] = t_end
 simulation_parameters["seed"] = seed
+simulation_parameters["OR"] = k
 
 with open("../data/simulation_parameters.json", "w") as f:
     json.dump(simulation_parameters, f)
@@ -119,27 +126,29 @@ f.close()
 
 # %%
 
-# beta = params["transmission"]
-# gamma = 1/params["infectious_period"]
+beta = params["transmission"]
+gamma = 1/params["infectious_period"]
 
-# pi = beta/(beta + gamma)
-# plt.figure()
+pi = beta/(beta + gamma)
+plt.figure()
 
-# kk = np.arange(0.02, 0.24, step = 0.02)
-# for k in kk:
-#     k=k.round(2)
-#     A = k/(1-(1-k)*pi) - 1
+kk = np.array([0.1, 0.08, 0.22, 0.3])
+p = np.arange(0, 1, step=0.01)
+c = []
+idxes = []
+for i, k in enumerate(kk):
+    k = k.round(2)
+    A = k/(1-(1-k)*pi) - 1
 
-#     p = np.arange(0, 1, step=0.01)
+    c.append(1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A))))
 
-#     c = 1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A)))
+    idx = next(ii for ii, cc in enumerate(c[i]) if cc < 0)
+    idxes.append(idx)
 
-#     idx = next(i for i, cc in enumerate(c) if cc < 0)
-
-
-#     plt.plot(p[:idx], c[:idx], label="k: " +str(k))
-# plt.xlabel("p")
-# plt.ylabel("c")
-# plt.plot([0.9, 0.9], [0, 1], ":k")
-# plt.legend(loc=(1.1, 0.))
-# plt.show()
+    plt.plot(p[:idx], c[i][:idx], label="k: " + str(k))
+plt.xlabel("p")
+plt.ylabel("c")
+plt.plot([0.9, 0.9], [0, 1], ":k")
+plt.plot([0.5, 0.5], [0, 1], ":k")
+plt.legend(loc=(1.1, 0.))
+plt.show()

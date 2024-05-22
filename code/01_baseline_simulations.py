@@ -39,9 +39,9 @@ with open("../data/simulation_parameters.json", "r") as f:
 f.close()
 
 save_file = child_directory + \
-    f"/baseline_simulations_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.json"
+    f"/baseline_simulations_p_{round(simulation_parameters['params']['inf_B_efficacy'],2)}_c_{round(simulation_parameters['params']['susc_B_efficacy'],2)}_OR_{simulation_parameters['OR']}_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.json"
 save_file_model = child_directory_model + \
-    f"/baseline_simulations_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.json"
+    f"/baseline_simulations_p_{round(simulation_parameters['params']['inf_B_efficacy'],2)}_c_{round(simulation_parameters['params']['susc_B_efficacy'],2)}_OR_{simulation_parameters['OR']}_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.json"
 
 # %%
 

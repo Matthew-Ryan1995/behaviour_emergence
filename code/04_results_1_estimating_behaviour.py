@@ -30,11 +30,38 @@ with open("../data/simulation_parameters.json", "r") as f:
     simulation_parameters = json.load(f)
 f.close()
 
+# %%
+
+num_trajectories = 100
+OR = 0.08
+
+
+target_file = f"trajectories_{num_trajectories}.json"
+
+filenames = [f for idx, f in enumerate(filenames) if target_file in f]
+
+target_file = f"OR_{OR}"
+
+filenames = [f for idx, f in enumerate(filenames) if target_file in f]
+
+if len(filenames) > 1:
+    # p = 0.75
+    c = 0.12
+    target_file = f"c_{c}"
+
+    filenames = [f for idx, f in enumerate(filenames) if target_file in f]
+
+
 with open(file_path + filenames[0], "r") as f:
     results_json = json.load(f)
 f.close()
 
 results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
+
+save_name = filenames[0]
+save_name = save_name.replace("baseline_simulatims_", "")
+save_name = save_name.replace(".json", "")
+
 # %% Plot parameters
 
 dpi = 600
@@ -89,7 +116,7 @@ plt.xticks(fontsize=font_size)
 plt.yticks(fontsize=font_size)
 # plt.legend(["Behaviour", "Infection"])
 # plt.title("Dashed line - exponential\nDotted line - Cubic")
-plt.savefig("../figs/results1_timeseries.png",
+plt.savefig(f"../figs/results1_{save_name}_timeseries.png",
             dpi=dpi,
             bbox_inches="tight")
 plt.close()
@@ -149,7 +176,7 @@ plt.yticks(fontsize=font_size)
 
 plt.legend()
 
-plt.savefig("../figs/results1_behaviour_snapshot.png",
+plt.savefig(f"../figs/results1_{save_name}_behaviour_snapshot.png",
             dpi=dpi,
             bbox_inches="tight")
 plt.close()
