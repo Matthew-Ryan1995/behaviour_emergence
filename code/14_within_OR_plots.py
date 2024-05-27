@@ -95,8 +95,8 @@ for OR in tmp["OR"].unique():
                      pHat_upr_smooth, color=color, alpha=.1)
 
 
-plt.xlabel("p", fontsize=font_size)
-plt.ylabel("outbreak prob", fontsize=font_size)
+plt.xlabel("Behaviour efficacy (p)", fontsize=font_size)
+plt.ylabel("Outbreak probability", fontsize=font_size)
 
 
 # plt.yticks([0.25, 0.5, 0.75], fontsize=font_size)
@@ -104,7 +104,8 @@ plt.ylabel("outbreak prob", fontsize=font_size)
 # plt.text(-1.34, 0., "0.00", fontsize=font_size)
 
 plt.xticks(fontsize=font_size)
-plt.legend(loc=(1, 0.5))
+plt.yticks(fontsize=font_size)
+# plt.legend(loc="upper right")
 
 plt.savefig("../figs/within_OR_outbreak_prob.png",
             dpi=dpi, bbox_inches="tight")
@@ -162,7 +163,7 @@ for OR in tmp["OR"].unique():
                      pHat_upr_smooth, color=color, alpha=.1)
 
 
-plt.xlabel("p", fontsize=font_size)
+plt.xlabel("Behaviour efficacy (p)", fontsize=font_size)
 plt.ylabel("Final size", fontsize=font_size)
 
 
@@ -171,7 +172,8 @@ plt.ylabel("Final size", fontsize=font_size)
 # plt.text(-1.34, 0., "0.00", fontsize=font_size)
 
 plt.xticks(fontsize=font_size)
-plt.legend(loc=(1, 0.5))
+plt.yticks(fontsize=font_size)
+plt.legend(loc="upper right")
 
 plt.savefig("../figs/within_OR_final_size.png", dpi=dpi, bbox_inches="tight")
 plt.close()
@@ -230,59 +232,59 @@ for d in day:
             ax.text(1 + 0.05, -15, f"day {d}", fontsize=font_size)
 
         if (e == "poly") & (d == 15):
-            ax.set_xlabel("$p$", x=-0.1, fontsize=font_size)
+            ax.set_xlabel("Behaviour efficacy (p)", x=-0.1, fontsize=font_size)
         if (e == "exp") & (d == 10):
-            ax.set_ylabel("$Log-Error$", fontsize=font_size)
+            ax.set_ylabel("Log-Error", fontsize=font_size)
         # plt.show()
         c += 1
-plt.legend(loc=(1.1, -0.9))
+plt.legend(loc=(1.02, 3))
 fig.savefig("../figs/within_OR_error.png", dpi=dpi, bbox_inches="tight")
 plt.close(fig)
 
 
 # %%
-for d in day:
-    for e in error_type:
-        if e == "poly":
-            E = "cubic"
-        else:
-            E = "exponential"
+# for d in day:
+#     for e in error_type:
+#         if e == "poly":
+#             E = "cubic"
+#         else:
+#             E = "exponential"
 
-        plt.figure()
-        R0_max = tmp_df_prime["p"].max()
+#         plt.figure()
+#         R0_max = tmp_df_prime["p"].max()
 
-        tmp = tmp_df_prime[["OR", "p", f"{e}_error_{d}"]]
+#         tmp = tmp_df_prime[["OR", "p", f"{e}_error_{d}"]]
 
-        tmp.loc[:, (f"{e}_error_{d}")] = np.log(tmp.loc[:, (f"{e}_error_{d}")])
+#         tmp.loc[:, (f"{e}_error_{d}")] = np.log(tmp.loc[:, (f"{e}_error_{d}")])
 
-        y_max = tmp[f"{e}_error_{d}"].max()
-        y_min = tmp[f"{e}_error_{d}"].min()
+#         y_max = tmp[f"{e}_error_{d}"].max()
+#         y_min = tmp[f"{e}_error_{d}"].min()
 
-        ax = plt.gca()
-        for OR in tmp["OR"].unique():
-            tmp_df = tmp[tmp["OR"] == OR]
-            B_range = np.linspace(
-                start=tmp_df["p"].min(), stop=tmp_df["p"].max(), num=300)
+#         ax = plt.gca()
+#         for OR in tmp["OR"].unique():
+#             tmp_df = tmp[tmp["OR"] == OR]
+#             B_range = np.linspace(
+#                 start=tmp_df["p"].min(), stop=tmp_df["p"].max(), num=300)
 
-            spl = make_smoothing_spline(np.array(tmp_df["p"]),
-                                        np.array(tmp_df[f"{e}_error_{d}"]))
-            pHat_smooth = spl(B_range)
+#             spl = make_smoothing_spline(np.array(tmp_df["p"]),
+#                                         np.array(tmp_df[f"{e}_error_{d}"]))
+#             pHat_smooth = spl(B_range)
 
-            # plt.plot(tmp_df["p"], tmp_df["pHat"], )
-            color = next(ax._get_lines.prop_cycler)['color']
-            plt.scatter(tmp_df["p"], tmp_df[f"{e}_error_{d}"], color=color, marker=".",
-                        alpha=.1)
-            plt.plot(B_range, pHat_smooth, color=color, label="OR: " + str(OR))
+#             # plt.plot(tmp_df["p"], tmp_df["pHat"], )
+#             color = next(ax._get_lines.prop_cycler)['color']
+#             plt.scatter(tmp_df["p"], tmp_df[f"{e}_error_{d}"], color=color, marker=".",
+#                         alpha=.1)
+#             plt.plot(B_range, pHat_smooth, color=color, label="OR: " + str(OR))
 
-        plt.tick_params(axis='both', which='major', labelsize=font_size)
-        plt.title(f"{E}", fontsize=font_size)
-        plt.text(R0_max + 0.05, (y_max + y_min) /
-                 2, f"day {d}", fontsize=font_size)
+#         plt.tick_params(axis='both', which='major', labelsize=font_size)
+#         plt.title(f"{E}", fontsize=font_size)
+#         plt.text(R0_max + 0.05, (y_max + y_min) /
+#                  2, f"day {d}", fontsize=font_size)
 
-        plt.xlabel("$p$", x=-0.1, fontsize=font_size)
-        plt.ylabel("$Log-Error$", fontsize=font_size)
-        # plt.show()
-        plt.legend(loc=(1, 0.1))
-        plt.savefig(
-            f"../figs/within_OR_error_{e}_day{d}.png", dpi=dpi, bbox_inches="tight")
-        plt.close()
+#         plt.xlabel("$p$", x=-0.1, fontsize=font_size)
+#         plt.ylabel("$Log-Error$", fontsize=font_size)
+#         # plt.show()
+#         plt.legend(loc=(1, 0.1))
+#         plt.savefig(
+#             f"../figs/within_OR_error_{e}_day{d}.png", dpi=dpi, bbox_inches="tight")
+#         plt.close()

@@ -9,6 +9,7 @@ Created on Tue Apr 30 14:46:18 2024
 from bad_ctmc import *
 import os
 import json
+import gzip
 import pickle
 import multiprocessing
 import numpy as np
@@ -56,7 +57,7 @@ def run_simulation_with_event(Bstar,
     #     return "Done"
     Bstar = round(Bstar, 3)
 
-    save_name = f"/Bstar_{Bstar}_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.json"
+    save_name = f"/Bstar_{Bstar}_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.gz"
 
     save_file = child_directory + save_name
     save_file_model = child_directory_model + save_name
@@ -80,8 +81,11 @@ def run_simulation_with_event(Bstar,
     results = model.run(number_of_trajectories=simulation_parameters["num_trajectory"],
                         seed=simulation_parameters["seed"])
 
-    with open(save_file, "w") as f:
-        json.dump(results.to_json(), f)
+    # with open(save_file, "w") as f:
+    #     json.dump(results.to_json(), f)
+    # f.close()
+    with gzip.open(save_file, "wb") as f:
+        f.write(compress_data(results.to_json()))
     f.close()
 
     with open(save_file_model, "wb") as f:

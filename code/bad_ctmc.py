@@ -11,6 +11,8 @@ Central place to save the BaD CTMC model
 
 import gillespy2
 from scipy.optimize import fsolve
+import json
+import gzip
 
 # %%
 
@@ -225,6 +227,49 @@ def bad_ctmc(param_vals: dict, P: int = 100, I0: int = 1, B0: int = 1, t_end: in
     return model
 
 
+# def get_w1(Bstar, params: dict):
+#     """
+#     This calculation assumes that a1 =/= w1.
+#     Parameters
+#     ----------
+#     Bstar : Float
+#         Target behaviour level in infection-free equilibrium.
+#     params : dict
+#         Parameter value to define the model.  Inputs are:
+#             :param transmission: float, the transmission rate from those infectious to those susceptible.
+#             :param infectious_period: int, the average infectious period.
+#             :param immune_period: int (optional), average Immunity period (for SIRS)
+#             :param susc_B_efficacy: probability (0, 1), effectiveness in preventing disease contraction if S wears mask (c)
+#             :param inf_B_efficacy: probability (0, 1), effectiveness in preventing disease transmission if I wears mask (p)
+#             :param N_social: float, social influence of non-behaviour on behaviour (a1)
+#             :param N_const: float, Spontaneous abandonement of behaviour (a2)
+#             :param B_social: float, social influence of behaviour on non-behaviour (w1)
+#             :param B_fear: float, Fear of disease for non-behaviour to behaviour(w2)
+#             :param B_const: float, Spontaneous uptake of behaviour (w2)
+
+#     Returns
+#     -------
+#     Float
+#         The social influence (w1) needed to ensure beahviour level Bstar given a1, a2, w2, and w3.
+
+#     """
+#     a1 = params["N_social"]
+#     w3 = params["B_const"]
+
+#     k = a1 + w3 + params["N_const"]
+
+#     def solve_w1(x):
+#         ans = ((1-2*Bstar)**2 - 1) * x**2 + (2*(2*Bstar*a1 - k)*(1-2*Bstar) -
+#                                              (4*w3 - 2*k)) * x + ((2*Bstar*a1 - k)**2 - (k**2 - 4*a1*w3))
+#         return ans
+
+#     w1 = fsolve(solve_w1, x0=[0, 1, 2])
+#     if w1.min() > 0:
+#         ans = w1.min()
+#     else:
+#         ans = w1.max()
+#     return ans
+
 def get_w1(Bstar, params: dict):
     """
     This calculation assumes that a1 =/= w1.
@@ -256,13 +301,54 @@ def get_w1(Bstar, params: dict):
 
     k = a1 + w3 + params["N_const"]
 
-    def solve_w1(x):
-        ans = ((1-2*Bstar)**2 - 1) * x**2 + (2*(2*Bstar*a1 - k)*(1-2*Bstar) -
-                                             (4*w3 - 2*k)) * x + ((2*Bstar*a1 - k)**2 - (k**2 - 4*a1*w3))
-        return ans
+    A = (1-2*Bstar)**2 - 1
+    B = -(1-4*Bstar**2) * a1 - 4*(Bstar * k - w3) + a1
 
-    w1 = fsolve(solve_w1, x0=[0, 1, 2])
-    return w1.max()
+    ans = B/A
+    if ans < 0:
+        ans = 0
+
+    return ans
+
+
+def get_w3(Bstar_min, params: dict):
+    """
+    Returns a value of w3 that will give a minimum behaviour prevalence of Bstar_min assuming
+    that w1 = 0.  This gives a lower bound when varying w1.
+    Parameters
+    ----------
+    Bstar_min : Float
+        Minimum behaviour prevalence considered in the model.
+    params : dict
+        Parameter value to define the model.  Inputs are:
+            :param transmission: float, the transmission rate from those infectious to those susceptible.
+            :param infectious_period: int, the average infectious period.
+            :param immune_period: int (optional), average Immunity period (for SIRS)
+            :param susc_B_efficacy: probability (0, 1), effectiveness in preventing disease contraction if S wears mask (c)
+            :param inf_B_efficacy: probability (0, 1), effectiveness in preventing disease transmission if I wears mask (p)
+            :param N_social: float, social influence of non-behaviour on behaviour (a1)
+            :param N_const: float, Spontaneous abandonement of behaviour (a2)
+            :param B_social: float, social influence of behaviour on non-behaviour (w1)
+            :param B_fear: float, Fear of disease for non-behaviour to behaviour(w2)
+            :param B_const: float, Spontaneous uptake of behaviour (w2)
+
+    Returns
+    -------
+    Float
+        The social influence (w1) needed to ensure beahviour level Bstar given a1, a2, w2, and w3.
+
+    """
+    a1 = params["N_social"]
+    a2 = params["N_const"]
+
+    A = Bstar_min*(a1+a2) - a1*Bstar_min**2
+    B = 1-Bstar_min
+
+    ans = A/B
+    if ans < 0:
+        ans = 0
+
+    return ans
 
 
 def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=0.001):
@@ -289,6 +375,30 @@ def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=0.001):
         ans = 1
 
     return ans
+
+
+def compress_data(data):
+    """
+    A convenience function taken from:
+    https://gist.github.com/LouisAmon/4bd79b8ab80d3851601f3f9016300ac4
+
+    Parameters
+    ----------
+    data : sr/json
+
+    Returns
+    -------
+    compressed : Compressed version of json
+
+    """
+    # Convert to JSON
+    # json_data = json.dumps(data, indent=2)
+    # Convert to bytes
+    encoded = data.encode('utf-8')
+    # Compress
+    compressed = gzip.compress(encoded)
+    return compressed
+
 
 # %%
 

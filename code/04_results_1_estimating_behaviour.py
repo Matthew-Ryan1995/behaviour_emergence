@@ -7,6 +7,7 @@ Created on Tue Apr 30 16:19:56 2024
 """
 # %% Libraries
 import json
+import gzip
 import gillespy2
 import os
 from BaD import *
@@ -33,10 +34,10 @@ f.close()
 # %%
 
 num_trajectories = 100
-OR = 0.08
+OR = 0.22
 
 
-target_file = f"trajectories_{num_trajectories}.json"
+target_file = f"trajectories_{num_trajectories}"
 
 filenames = [f for idx, f in enumerate(filenames) if target_file in f]
 
@@ -46,15 +47,25 @@ filenames = [f for idx, f in enumerate(filenames) if target_file in f]
 
 if len(filenames) > 1:
     # p = 0.75
-    c = 0.12
+    c = 0.45
     target_file = f"c_{c}"
 
     filenames = [f for idx, f in enumerate(filenames) if target_file in f]
 
 
-with open(file_path + filenames[0], "r") as f:
-    results_json = json.load(f)
+with gzip.open(file_path + filenames[0], "rb") as f:
+    results_json_compressed = f.read()
+    results_json = gzip.decompress(results_json_compressed)
+    # results_json = results_json_compressed.decode("utf-8")
+    # results_json = json.loads(results_json)
 f.close()
+
+# with gzip.open("../text.gz", "rb") as f:
+#     json_bytes = f.read()
+
+# json_str = json_bytes.decode('utf-8')
+# tmp = json.loads(json_str)
+
 
 results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
 

@@ -16,11 +16,23 @@ w1 chosen such that B* = 0.03, value taken from https://covid19.healthdata.org/g
 """
 # %% Libraries
 from BaD import load_param_defaults
-from bad_ctmc import get_w1
+from bad_ctmc import get_w1, get_w3
 import json
 import numpy as np
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
+
+params = {"ytick.color": "black",
+          "xtick.color": "black",
+          "axes.labelcolor": "black",
+          "axes.edgecolor": "black",
+          # "text.usetex": True,
+          "font.family": "serif"}
+plt.rcParams.update(params)
+plt.rcParams['mathtext.fontset'] = 'dejavuserif'
+
+dpi = 600
+font_size = 16
 
 # %%
 
@@ -47,7 +59,7 @@ params["B_fear"] = params["B_fear"]/params["infectious_period"]
 params["N_social"] = params["N_social"] / params["infectious_period"]
 params["N_const"] = params["N_const"] / params["infectious_period"]
 
-params["B_const"] = B_star_min * params["N_const"] / (1-B_star_min)
+params["B_const"] = get_w3(Bstar_min=B_star_min, params=params)
 
 # params["B_social"] = (R0B * (params["N_social"] + params["N_const"]))
 
@@ -68,17 +80,20 @@ pi = beta/(beta + gamma)
 k = 0.22
 A = k/(1-(1-k)*pi) - 1
 
-c_min = 0.1
+c_min = 0.
 
 # p = params["inf_B_efficacy"]
-p = np.arange(0, 1, step=0.01)
+# p = np.arange(0, 1, step=0.01)
+p = 0.6  # Around 0.6 gives the optimal results on reduced final size
 
-c = 1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A)))
+c = round(1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A))), 2)
 
-idx = next(i for i, cc in enumerate(c) if cc < c_min)
+# idx = next(i for i, cc in enumerate(c) if cc < c_min)
 
-params["susc_B_efficacy"] = c[idx - 1]
-params["inf_B_efficacy"] = p[idx - 1]
+# idx = int(idx/2)
+
+params["susc_B_efficacy"] = c  # [idx]
+params["inf_B_efficacy"] = p  # [idx]
 
 # Set up initial conditions
 P = 5000  # population size, chosen for speed of simulations
@@ -132,8 +147,10 @@ gamma = 1/params["infectious_period"]
 pi = beta/(beta + gamma)
 plt.figure()
 
-kk = np.array([0.1, 0.08, 0.22, 0.3])
+kk = np.array([0.1, 0.2, 0.3, 0.6])
+# kk = np.array([0.22])
 p = np.arange(0, 1, step=0.01)
+# p = 0.9
 c = []
 idxes = []
 for i, k in enumerate(kk):
@@ -142,13 +159,21 @@ for i, k in enumerate(kk):
 
     c.append(1-((gamma * (A+1)) / ((1-p)*(gamma - beta * A))))
 
-    idx = next(ii for ii, cc in enumerate(c[i]) if cc < 0)
+    idx = next(ii for ii, cc in enumerate(c[i]) if cc < 0) + 1
     idxes.append(idx)
 
-    plt.plot(p[:idx], c[i][:idx], label="k: " + str(k))
-plt.xlabel("p")
-plt.ylabel("c")
-plt.plot([0.9, 0.9], [0, 1], ":k")
-plt.plot([0.5, 0.5], [0, 1], ":k")
-plt.legend(loc=(1.1, 0.))
+    plt.plot(p[:idx], c[i][:idx], label="OR: " + str(k))
+
+plt.xlabel("Infectious efficacy (p)", fontsize=font_size)
+plt.ylabel("Susceptible efficacy (c)", fontsize=font_size)
+
+plt.xticks(fontsize=font_size)
+plt.yticks(fontsize=font_size)
+
+plt.ylim(0, 1)
+plt.xlim(0, 1)
+# plt.plot([0.9, 0.9], [0, 1], ":k")
+# plt.plot([0.5, 0.5], [0, 1], ":k")
+plt.legend(loc=(1.01, 0.25), fontsize=font_size)
+plt.savefig("../figs/OR_vary_p_c.png", dpi=dpi,  bbox_inches="tight")
 plt.show()

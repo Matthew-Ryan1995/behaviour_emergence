@@ -15,7 +15,8 @@ import matplotlib.cm as cm
 import numpy as np
 # import seaborn as sns
 from scipy.interpolate import make_smoothing_spline
-
+# from scipy.interpolate import RegularGridInterpolator
+#
 params = {"ytick.color": "black",
           "xtick.color": "black",
           "axes.labelcolor": "black",
@@ -43,6 +44,27 @@ df["FS_conditional_upr"] = df["FS_conditional"] + \
 # %%
 dpi = 600
 font_size = 16
+
+
+# %%
+
+# tmp = df[["Bstar", "R0", "pHat"]]
+# tmp_pivot = tmp.pivot(index="Bstar", columns="R0", values="pHat")
+
+# z = np.array(tmp_pivot)
+# X = tmp_pivot.columns.values
+# Y = tmp_pivot.index.values
+
+# xx, yy = np.meshgrid(X, Y, indexing="ij")
+
+# f = RegularGridInterpolator((xx, yy), z, method='cubic')
+# xnew = np.arange(X.min(), X.max(), .001)
+# ynew = np.arange(Y.min(), Y.max(), .001)
+# data1 = f(xnew, ynew)
+# Xn, Yn = np.meshgrid(xnew, ynew)
+# plt.figure()
+# plt.contourf(Xn, Yn, data1, cmap=plt.cm.Blues)
+# plt.show()
 
 # %%
 tmp = df[["Bstar", "R0", "pHat"]]

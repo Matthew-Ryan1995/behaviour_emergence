@@ -8,6 +8,7 @@ Created on Wed May  1 08:17:47 2024
 # %% libraries
 
 import json
+import gzip
 import gillespy2
 import os
 from BaD import *
@@ -54,9 +55,14 @@ def find_median_curve(dlr, outbreaks, P):
 def load_bstar_data(file, file_path="../data/simulations/Bstar_by_R0/",
                     P=simulation_parameters["P"], params=simulation_parameters):
     # Load data
-    with open(file_path + file, "r") as f:
-        results_json = json.load(f)
+    # with open(file_path + file, "r") as f:
+    #     results_json = json.load(f)
+    # f.close()
+    with gzip.open(file_path + file, "rb") as f:
+        results_json_compressed = f.read()
+        results_json = gzip.decompress(results_json_compressed)
     f.close()
+
     results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
 
     # Probability of outbreak
@@ -149,6 +155,14 @@ df = df.sort_values(by=["Bstar", "R0"])
 df.to_csv("../data/df_results2_Bstar_by_R0.csv")
 
 # %%
+# file_path = "../data/simulations/Bstar_by_R0/"
+# for file in filenames:
+#     try:
+#         with open(file_path + file, "r") as f:
+#             results_json = json.load(f)
+#         f.close()
+#     except:
+#         print(file)
 
 # P = 10000
 # I0 = 1
