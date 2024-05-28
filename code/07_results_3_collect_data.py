@@ -41,7 +41,7 @@ if ".DS_Store" in baseline_files:
 # %%
 num_trajectories = 100
 
-target_file = f"trajectories_{num_trajectories}.json"
+target_file = f"trajectories_{num_trajectories}"
 
 filenames = [f for idx, f in enumerate(filenames) if target_file in f]
 baseline_files = [f for idx, f in enumerate(
@@ -116,9 +116,14 @@ def load_intervention_data(file, file_path="../data/simulations/interventions/",
 def load_baseline_data(file, file_path="../data/simulations/baseline/",
                        P=simulation_parameters["P"]):
     # Load data
-    with open(file_path + file, "r") as f:
-        results_json = json.load(f)
+    # with open(file_path + file, "r") as f:
+    #     results_json = json.load(f)
+    # f.close()
+    with gzip.open(file_path + file, "rb") as f:
+        results_json_compressed = f.read()
+        results_json = gzip.decompress(results_json_compressed)
     f.close()
+
     results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
 
     # Probability of outbreak
@@ -165,8 +170,18 @@ df = pd.DataFrame(df)
 df = df.sort_values(by=["target", "day", "strength"])
 
 df.to_csv("../data/df_results3_intervention.csv")
-
+# %%
 df_base = list(map(load_baseline_data, baseline_files))
 df_base = pd.DataFrame(df_base)
 
 df_base.to_csv("../data/df_results3_baseline.csv")
+
+# %%
+# file_path = "../data/simulations/interventions/"
+# for file in filenames:
+#     try:
+#         with open(file_path + file, "r") as f:
+#             results_json = json.load(f)
+#         f.close()
+#     except:
+#         print(file)

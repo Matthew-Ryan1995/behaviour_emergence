@@ -331,6 +331,7 @@ ylim = max(abs(ymin), abs(ymax))
 
 days = [5, 10, 15]
 targets = ["w1", "w2", "w3"]
+targets_display = ["$\omega_1$", "$\omega_2$", "$\omega_3$"]
 counter = 1
 
 for d in days:
@@ -341,7 +342,7 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(t, fontsize=font_size)
+            plt.title(targets_display[targets == t], fontsize=font_size)
 
         if t == "w3":
             plt.text(5.5, (ylim + (-ylim))/2,  f"day {d}", fontsize=font_size)
@@ -374,7 +375,7 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(t, fontsize=font_size)
+            plt.title(targets_display[targets == t], fontsize=font_size)
 
         if t == "w3":
             plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)
@@ -408,7 +409,7 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(t, fontsize=font_size)
+            plt.title(targets_display[targets == t], fontsize=font_size)
 
         if t == "w3":
             plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)

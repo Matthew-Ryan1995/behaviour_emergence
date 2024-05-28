@@ -63,7 +63,7 @@ params["B_const"] = get_w3(Bstar_min=B_star_min, params=params)
 
 # params["B_social"] = (R0B * (params["N_social"] + params["N_const"]))
 
-Bstar = 0.03
+Bstar = 0.03  # 0.13
 w1 = get_w1(Bstar, params)
 params["B_social"] = w1
 
@@ -126,7 +126,7 @@ f.close()
 
 int_start = 0
 int_stop = 5
-int_step = 0.1  # Change to get finer grain
+int_step = 0.1  # 0.5  # Change to get finer grain
 
 strength = np.arange(start=int_start, stop=int_stop +
                      int_step, step=int_step).round(2)

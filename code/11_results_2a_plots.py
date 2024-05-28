@@ -92,7 +92,7 @@ plt.xlim(xx.min(), xx.max())
 plt.ylim(yy.min(), yy.max())
 
 
-plt.xlabel("$R_0$", fontsize=font_size)
+plt.xlabel("$\mathscr{R}_0^D$", fontsize=font_size)
 plt.ylabel("$B^*$", fontsize=font_size)
 
 
@@ -133,7 +133,7 @@ plt.ylim(yy.min(), yy.max())
 cbar.ax.tick_params(labelsize=font_size)
 
 
-plt.xlabel("$R_0$", fontsize=font_size)
+plt.xlabel("$\mathscr{R}_0^D$", fontsize=font_size)
 plt.ylabel("$B^*$", fontsize=font_size)
 
 
@@ -215,7 +215,7 @@ for d in day:
             ax.text(R0_max + 0.5, 0.25, f"day {d}", fontsize=font_size)
 
         if (e == "poly") & (d == 15):
-            ax.set_xlabel("$R_0$", x=-0.1, fontsize=font_size)
+            ax.set_xlabel("$\mathscr{R}_0^D$", x=-0.1, fontsize=font_size)
         if (e == "exp") & (d == 10):
             ax.set_ylabel("$B^*$", fontsize=font_size)
         # plt.show()

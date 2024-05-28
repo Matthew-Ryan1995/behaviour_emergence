@@ -72,6 +72,7 @@ results = gillespy2.core.jsonify.Jsonify.from_json(results_json)
 save_name = filenames[0]
 save_name = save_name.replace("baseline_simulatims_", "")
 save_name = save_name.replace(".json", "")
+save_name = save_name.replace(".gz", "")
 
 # %% Plot parameters
 
