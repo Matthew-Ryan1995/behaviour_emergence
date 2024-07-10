@@ -1,0 +1,5 @@
+matplotlib
+gillespy2
+numpy
+scipy
+datetime
