@@ -54,7 +54,7 @@ with open("../text.gz", "wb") as f:
     f.write(compress_data(test_load))
 f.close()
 
-with gzip.open("../data/simulations/baseline/baseline_simulations_p_0.6_c_0.45_OR_0.22_seed_20240430_tend_200_trajectories_100.gz",
+with gzip.open("../data/simulations/baseline/baseline_simulations_p_0.6_c_0.45_OR_0.22_seed_20240430_tend_200_trajectories_1000.gz",
                "rb") as f:
     json_bytes = f.read()
 

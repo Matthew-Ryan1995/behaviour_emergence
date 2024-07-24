@@ -32,6 +32,14 @@ f.close()
 if ".DS_Store" in filenames:
     filenames.remove(".DS_Store")
 
+    # %%
+num_trajectories = 1000
+
+target_file = f"trajectories_{num_trajectories}"
+
+filenames = [f for idx, f in enumerate(filenames) if target_file in f]
+
+
 # %% Helper functions
 
 

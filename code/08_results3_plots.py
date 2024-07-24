@@ -3,7 +3,7 @@
 """
 Created on Wed May  1 10:21:59 2024
 
-todo: Improve standard error calculation of FS now that I am using proportions
+
 
 @author: rya200
 """
@@ -306,8 +306,8 @@ def create_plot(df, target, day, f, ymin=-1, ymax=1, subplot_idx=1, plot_type="l
 
         axarr = f.add_subplot(3, 3, subplot_idx)
 
-        plt.scatter(plot_data["strength"],
-                    plot_data["FS_conditional_diff"] * 100, color="grey", marker=".")
+        # plt.scatter(plot_data["strength"],
+        #             plot_data["FS_conditional_diff"] * 100, color="grey", marker=".")
         plt.plot(strength_range, FS_smooth, color="red")
         plt.fill_between(strength_range, FS_lwr_smooth,
                          FS_upr_smooth, color='red', alpha=.1)
@@ -330,6 +330,7 @@ ymax = df["log_odds_ratio_upr"].max()
 ylim = max(abs(ymin), abs(ymax))
 
 days = [5, 10, 15]
+target_count = 0
 targets = ["w1", "w2", "w3"]
 targets_display = ["$\omega_1$", "$\omega_2$", "$\omega_3$"]
 counter = 1
@@ -342,7 +343,8 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(targets_display[targets == t], fontsize=font_size)
+            plt.title(targets_display[target_count], fontsize=font_size)
+            target_count += 1
 
         if t == "w3":
             plt.text(5.5, (ylim + (-ylim))/2,  f"day {d}", fontsize=font_size)
@@ -366,6 +368,7 @@ ymin = df["FS_diff"].min() - 0.1
 ymax = df["FS_diff"].max() + 0.1
 
 counter = 1
+target_count = 0
 
 for d in days:
     for t in targets:
@@ -375,7 +378,8 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(targets_display[targets == t], fontsize=font_size)
+            plt.title(targets_display[target_count], fontsize=font_size)
+            target_count += 1
 
         if t == "w3":
             plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)
@@ -399,6 +403,7 @@ ymin = df["FS_conditional_diff_lwr"].min()
 ymax = df["FS_conditional_diff_upr"].max()
 
 counter = 1
+target_count = 0
 
 for d in days:
     for t in targets:
@@ -409,13 +414,14 @@ for d in days:
         counter += 1
 
         if d == 5:
-            plt.title(targets_display[targets == t], fontsize=font_size)
+            plt.title(targets_display[target_count], fontsize=font_size)
+            target_count += 1
 
         if t == "w3":
             plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)
 
         if (d == 10) & (t == "w1"):
-            plt.ylabel("Conditional Infections saved", fontsize=font_size)
+            plt.ylabel("Infections saved", fontsize=font_size)
         if (d == 15) & (t == "w2"):
             plt.xlabel("Strength of intervention", fontsize=font_size)
 
@@ -432,3 +438,4 @@ plt.close()
 # ax2 = fig.add_subplot(2, 2, 2)
 # ax2 = create_plot(df, "w1", 10)
 # plt.show()
+# %%

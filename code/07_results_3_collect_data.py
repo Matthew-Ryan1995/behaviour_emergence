@@ -39,7 +39,7 @@ if ".DS_Store" in baseline_files:
     baseline_files.remove(".DS_Store")
 
 # %%
-num_trajectories = 100
+num_trajectories = 1000
 
 target_file = f"trajectories_{num_trajectories}"
 

@@ -11,6 +11,8 @@ import os
 import json
 import gzip
 import pickle
+from datetime import datetime
+start_time = datetime.now()
 
 # %%
 phantom_counter = 0
@@ -53,7 +55,8 @@ model = bad_ctmc(param_vals=simulation_parameters["params"],
                  t_end=simulation_parameters["t_end"])
 
 results = model.run(number_of_trajectories=simulation_parameters["num_trajectory"],
-                    seed=simulation_parameters["seed"])
+                    seed=simulation_parameters["seed"],
+                    solver=gillespy2.solvers.TauHybridCSolver)
 
 # with open(save_file, "w") as f:
 #     json.dump(results.to_json(), f)
@@ -67,3 +70,5 @@ f.close()
 with open(save_file_model, "wb") as f:
     pickle.dump(model, f)
 f.close()
+
+print(f"Time taken: {datetime.now()-start_time}")

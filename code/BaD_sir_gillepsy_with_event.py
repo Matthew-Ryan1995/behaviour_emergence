@@ -52,7 +52,7 @@ params["B_social"] = (
 # a1 = params["N_social"]
 # a2 = params["N_const"]
 
-P = 10000
+P = 100
 I0 = 1
 B0 = 1
 
@@ -227,7 +227,8 @@ num_trajectory = 100
 start_time = datetime.now()
 
 model = bad_ctmc(param_vals=params, P=P, I0=I0, B0=B0, t_end=t_end)
-results = model.run(number_of_trajectories=num_trajectory)
+results = model.run(number_of_trajectories=num_trajectory,
+                    solver=gillespy2.solvers.TauHybridCSolver)
 
 print(f"Time taken: {datetime.now()-start_time}")
 
@@ -317,12 +318,12 @@ print(np.mean(res2))
 
 # %%
 
-with open("test.json", "w") as f:
-    json.dump(results.to_json(), f)
+# with open("test.json", "w") as f:
+#     json.dump(results.to_json(), f)
 
-# %%
+# # %%
 
-with open("test.json", "r") as f:
-    test_load = json.load(f)
+# with open("test.json", "r") as f:
+#     test_load = json.load(f)
 
-test_load_dict = gillespy2.core.jsonify.Jsonify.from_json(test_load)
+# test_load_dict = gillespy2.core.jsonify.Jsonify.from_json(test_load)

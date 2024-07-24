@@ -85,9 +85,15 @@ im = plt.contourf(xx, yy, z,  cmap=plt.cm.Blues)
 #                   alpha=0.5)
 cbar = plt.colorbar(im, format=tkr.PercentFormatter(xmax=1, decimals=1))
 cbar.ax.tick_params(labelsize=font_size)
+new_tick_labels = [str(x) + "%" for x in range(0, 100, 15)]
+new_tick_labels.append("100%")
+cbar.set_ticklabels(new_tick_labels)
 # cbar_lvls = ctr.levels[1:-1]
 # cbar.add_lines(ctr)
 # cbar.set_ticks(cbar_lvls)
+
+plt.plot([3.28, 3.28], [0, 1], "black")
+
 plt.xlim(xx.min(), xx.max())
 plt.ylim(yy.min(), yy.max())
 
@@ -127,10 +133,16 @@ cbar = plt.colorbar(im, format=tkr.PercentFormatter(xmax=1, decimals=1))
 # cbar_lvls = ctr.levels[1:-1]
 # cbar.add_lines(ctr)
 # cbar.set_ticks(cbar_lvls)
+
+plt.plot([3.28, 3.28], [0, 1], "black")
+
 plt.xlim(xx.min(), xx.max())
 plt.ylim(yy.min(), yy.max())
 
 cbar.ax.tick_params(labelsize=font_size)
+new_tick_labels = [str(x) + "%" for x in range(0, 100, 15)]
+new_tick_labels.append("100%")
+cbar.set_ticklabels(new_tick_labels)
 
 
 plt.xlabel("$\mathscr{R}_0^D$", fontsize=font_size)
@@ -202,6 +214,9 @@ for d in day:
         # cbar_lvls = ctr.levels[1:-1]
         # cbar.add_lines(ctr)
         # cbar.set_ticks(cbar_lvls)
+
+        ax.plot([3.28, 3.28], [0, 0.5], "black")
+
         ax.set_xlim(xx.min(), xx.max())
         ax.set_xticks([1, 3, 5, 7, 9])
 

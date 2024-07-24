@@ -79,7 +79,8 @@ def run_simulation_with_event(tmp,
                      t_end=simulation_parameters["t_end"])
 
     results = model.run(number_of_trajectories=500,  # simulation_parameters["num_trajectory"],
-                        seed=simulation_parameters["seed"])
+                        seed=simulation_parameters["seed"],
+                        solver=gillespy2.solvers.TauHybridCSolver)
 
     # with open(save_file, "w") as f:
     #     json.dump(results.to_json(), f)

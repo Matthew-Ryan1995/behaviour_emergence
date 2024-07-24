@@ -59,7 +59,7 @@ params["B_fear"] = params["B_fear"]/params["infectious_period"]
 params["N_social"] = params["N_social"] / params["infectious_period"]
 params["N_const"] = params["N_const"] / params["infectious_period"]
 
-params["B_const"] = get_w3(Bstar_min=B_star_min, params=params)
+params["B_const"] = get_w3(Bstar_min=B_star_min, params=params) * 1
 
 # params["B_social"] = (R0B * (params["N_social"] + params["N_const"]))
 
@@ -99,7 +99,7 @@ params["inf_B_efficacy"] = p  # [idx]
 P = 5000  # population size, chosen for speed of simulations
 I0 = 1  # Initial infected
 B0 = 1  # Initial Behaviour
-num_trajectory = 100
+num_trajectory = 1000
 
 # Number of simulation days heuristically chosen
 # Most epidemics are completed by this time (number of infected individuals goes to 0)

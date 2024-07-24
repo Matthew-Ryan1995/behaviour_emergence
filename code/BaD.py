@@ -25,7 +25,7 @@ import json
 
 class bad(object):
     """
-    Ibplementation of the SIR model with mask states for each compartment.  Explicitly, we assume proportion and not counts.
+    Implementation of the SIR model with mask states for each compartment.  Explicitly, we assume proportion and not counts.
     Currently assuming no demograhpy, no death due to pathogen, homogenous mixing, transitions between mask/no mask deteRbined by
     social influence and fear of disease.  Currently assuming FD-like "infection" process for masks with fear of disease.
     """

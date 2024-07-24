@@ -84,7 +84,8 @@ def run_simulation_with_event(inter_scenario,
                      event=event)
 
     results = model.run(number_of_trajectories=simulation_parameters["num_trajectory"],
-                        seed=simulation_parameters["seed"])
+                        seed=simulation_parameters["seed"],
+                        solver=gillespy2.solvers.TauHybridCSolver)
 
     # with open(save_file, "w") as f:
     #     json.dump(results.to_json(), f)
@@ -109,3 +110,12 @@ if __name__ == '__main__':
         p.map(run_simulation_with_event, intervention_params)
 
     print(f"Time taken: {datetime.now()-start_time}")
+# %%
+# array_num = 1
+# step_size = 500
+
+# start_index = ((array_num-1)*step_size)
+# end_index = array_num * step_size
+# if end_index > len(intervention_params):
+#     end_index = len(intervention_params)
+# print(intervention_params[start_index:end_index])
