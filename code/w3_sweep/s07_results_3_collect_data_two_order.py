@@ -3,7 +3,9 @@
 """
 Created on Wed May  1 08:17:47 2024
 
-@author: rya200
+Appendix w3 sweep collect data by 2 orders of magnitude
+
+@author: Matt Ryan
 """
 # %% libraries
 

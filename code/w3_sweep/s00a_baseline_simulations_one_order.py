@@ -3,7 +3,9 @@
 """
 Created on Tue Apr 30 14:24:16 2024
 
-@author: rya200
+Appendix w3 sweep baseline simulations by 1 order of magnitude
+
+@author: Matt Ryan
 """
 # %% Libraries
 from bad_ctmc import *

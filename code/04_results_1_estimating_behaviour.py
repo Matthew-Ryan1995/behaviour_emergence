@@ -3,7 +3,9 @@
 """
 Created on Tue Apr 30 16:19:56 2024
 
-@author: rya200
+Generate plots for results 1.
+
+@author: Matt Ryan
 """
 # %% Libraries
 import json

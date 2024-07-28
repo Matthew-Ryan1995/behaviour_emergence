@@ -3,6 +3,8 @@
 """
 Created on Tue Apr 30 12:50:00 2024
 
+Appendix w3 sweep parameters by 1 order of magnitude
+
 Create the parameter set and the initial conditions for all subsequent simulations
 
 Epi params taken from https://doi.org/10.1186/s40001-023-01047-0
@@ -12,7 +14,7 @@ Behaviour params taken from Ryan2024
 w1 chosen such that B* = 0.03, value taken from https://covid19.healthdata.org/global for Aust. mask wearing
 
 
-@author: rya200
+@author: Matt Ryan
 """
 # %% Libraries
 from BaD import load_param_defaults

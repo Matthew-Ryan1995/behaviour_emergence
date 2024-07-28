@@ -3,7 +3,10 @@
 """
 Created on Tue Apr 30 14:46:18 2024
 
-@author: rya200
+
+Appendix w3 sweep intervention simulations by 2 orders of magnitude
+
+@author: Matt Ryan
 """
 # %% Libraries
 from bad_ctmc import *

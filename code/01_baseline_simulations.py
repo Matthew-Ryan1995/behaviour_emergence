@@ -3,7 +3,9 @@
 """
 Created on Tue Apr 30 14:24:16 2024
 
-@author: rya200
+Baseline simulations, looking at results 1.
+
+@author: Matt Ryan
 """
 # %% Libraries
 from bad_ctmc import *

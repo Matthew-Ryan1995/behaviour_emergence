@@ -12,7 +12,7 @@ Behaviour params taken from Ryan2024
 w1 chosen such that B* = 0.03, value taken from https://covid19.healthdata.org/global for Aust. mask wearing
 
 
-@author: rya200
+@author: Matt Ryan
 """
 # %% Libraries
 from BaD import load_param_defaults

@@ -3,9 +3,9 @@
 """
 Created on Wed May  1 10:21:59 2024
 
-todo: Improve standard error calculation of FS now that I am using proportions
+Appendix w3 sweep plots by 1 order of magnitude
 
-@author: rya200
+@author: Matt Ryan
 """
 # %% Libraries
 import pandas as pd

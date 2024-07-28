@@ -3,9 +3,9 @@
 """
 Created on Wed May  1 10:21:59 2024
 
+Create plots for results 3
 
-
-@author: rya200
+@author: Matt Ryan
 """
 # %% Libraries
 import pandas as pd

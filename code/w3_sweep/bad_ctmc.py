@@ -3,9 +3,9 @@
 """
 Created on Tue Apr 30 09:54:49 2024
 
-Central place to save the BaD CTMC model
+Fit and simulate from a CTCM BaD SIR Model.
 
-@author: rya200
+@author: Matt Ryan
 """
 # %%
 

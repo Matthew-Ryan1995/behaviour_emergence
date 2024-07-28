@@ -3,7 +3,9 @@
 """
 Created on Wed May  1 08:17:47 2024
 
-@author: rya200
+Collect data for results 3
+
+@author: Matt Ryan
 """
 # %% libraries
 
