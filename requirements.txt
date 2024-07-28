@@ -3,3 +3,11 @@ gillespy2
 numpy
 scipy
 datetime
+json
+gzip
+os
+pickle
+multiprocessing	
+pandas
+math
+re
