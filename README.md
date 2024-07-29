@@ -47,3 +47,6 @@ This is a compartmental stochastic model for a covid-like illness with self prot
 - code/14_between_OR_plots.py
 - code/w3_sweep/*
 
+*HPC Versions*: version of code to run all simulations on a SLURM HPC.
+
+- HPC_versions/*
