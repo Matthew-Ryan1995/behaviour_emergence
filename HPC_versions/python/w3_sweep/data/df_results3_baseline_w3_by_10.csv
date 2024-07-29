@@ -1,0 +1,2 @@
+,type,num_trajectories,pHat,pHat_std,FS_avg,FS_std,FS_conditional,FS_conditional_std
+0,baseline,500,0.674,0.020963015050321363,0.5116028,0.015911138472916385,0.7589169139465876,0.0007446834138371556
