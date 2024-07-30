@@ -4,7 +4,7 @@
 #SBATCH --time=02:00:00    	                                # walltime allocation, which has the format (D-HH:MM:SS), here set to 1 hour
 #SBATCH --mem=5GB         	                                # memory required per node (here set to 4 GB)
 #SBATCH --output=slurm_outputs/w3_sweeps/order_two/slurm-%A_%a.out
-#SBATCH --account=OD-223323
+
 
 # Notification configuration
 #SBATCH --array=1-10

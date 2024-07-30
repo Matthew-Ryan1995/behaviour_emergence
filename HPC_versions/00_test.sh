@@ -1,18 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jul 22 13:45:24 2024
-
-@author: rya200
-"""
-
 #!/bin/bash
 #SBATCH -N 1               	                                # number of nodes (no MPI, so we only use a single node)
 #SBATCH -n 20            	                                # number of cores
 #SBATCH --time=00:02:00    	                                # walltime allocation, which has the format (D-HH:MM:SS), here set to 1 hour
 #SBATCH --mem=5GB         	                                # memory required per node (here set to 4 GB)
 #SBATCH --output=slurm_outputs/test/slurm-%A_%a.out
-#SBATCH --account=OD-223323
+
 
 # Notification configuration
 #SBATCH --array=1-2
