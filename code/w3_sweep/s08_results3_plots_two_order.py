@@ -290,7 +290,7 @@ for d in days:
             plt.text(5.5, (ymin + ymax)/2, f"day {d}", fontsize=font_size)
 
         if (d == 10) & (t == "w1"):
-            plt.ylabel("Infections saved", fontsize=font_size)
+            plt.ylabel("Infections saved (%)", fontsize=font_size)
         if (d == 15) & (t == "w2"):
             plt.xlabel("Strength of intervention", fontsize=font_size)
 

@@ -1,6 +1,6 @@
 # behaviour_emergence
 
-This git repo will reproduce the results for the paper *Behaviour emergence in a BaD modelling framework*.  The purpose of this work is to investigate:
+This git repo will reproduce the results for the paper *Behaviour and infection feedback loops inform early stage behaviour emergence and the efficacy of interventions*.  The purpose of this work is to investigate:
 
 1. Early approximations of the prevalence of self protective behaviours in the presence of an infectious disease, and
 2. The effects of self protective behaviour on the outbreak probability and final size of an epidemic.
@@ -16,9 +16,28 @@ This is a compartmental stochastic model for a covid-like illness with self prot
 - code/bad_ctmc.py
 
 *Model parameters*: Default parameters and simulation parameters.
-
+ 
 - code/model_parameters.json
-- code/00_create_parameters_set.py
+- code/00_create_parameters_set.py 
+
+The key simulation parameters to be altered in `code/00_create_parameters_set.py` are:
+
+* `k` - The odds ratio for reduced infection rates
+* `P` - The population size
+* `I0` - The initial number of infected individuals
+* `B0` - The initial number of individuals performing behaviour
+* `num_trajectory` - The number of simulations to run (Note, we suggest making this smaller to get the code up and running)
+* `t_end` - The end time for simulations to be run
+* `seed` - The seed for reproducibility
+
+For the interventions:
+
+* `int_start` - The smallest strength considered for interventions
+* `int_stop` - The largest strength considered for interventions
+* `int_step` - The granularity of intervention strength
+* `day` - The days to implement interventions
+
+All other parameters are defined in the paper and have corresponding names in `model_parameters.json` and `00_create_parameters_set.py`.
 
 *Results 1*: create simulations for behaviour approximations and generate plots.
 
