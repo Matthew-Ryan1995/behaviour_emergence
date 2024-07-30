@@ -53,7 +53,7 @@ class bad(object):
             self.__setattr__(key, value)
         self.N_fear = 0
 
-    def set_defaults(self, filename="/Users/rya200/Library/CloudStorage/OneDrive-CSIRO/Documents/03_projects/reid-mask_sir_toymodel/code/model_parameters.json"):
+    def set_defaults(self, filename="../model_parameters.json"):
         """
         Written by: Rosyln Hickson
         Pull out default values from a file in json format.
@@ -373,7 +373,7 @@ class bad(object):
 # %% functions external to class
 
 
-def load_param_defaults(filename="/Users/rya200/Library/CloudStorage/OneDrive-CSIRO/Documents/03_projects/reid-mask_sir_toymodel/code/model_parameters.json"):
+def load_param_defaults(filename="../model_parameters.json"):
     """
     Written by: Rosyln Hickson
     Pull out default values from a file in json format.
