@@ -1,5 +1,5 @@
-matplotlib
-gillespy2
+matplotlib==3.8.3
+gillespy2==1.8.2
 numpy
 scipy
 datetime
@@ -8,6 +8,6 @@ gzip
 os
 pickle
 multiprocessing	
-pandas
+pandas==1.5.2
 math
 re
