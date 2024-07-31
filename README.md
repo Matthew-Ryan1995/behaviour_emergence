@@ -5,8 +5,9 @@ This git repo will reproduce the results for the paper *Behaviour and infection 
 1. Early approximations of the prevalence of self protective behaviours in the presence of an infectious disease, and
 2. The effects of self protective behaviour on the outbreak probability and final size of an epidemic.
 
-This is a compartmental stochastic model for a covid-like illness with self protective behaviour accounted for using behaviour science theory and is simulated using the `gillespy2` python package.  Other modules needed are in `requirements.txt` file.
+This is a compartmental stochastic model for a covid-like illness with self protective behaviour accounted for using behaviour science theory and is simulated using the `gillespy2` python package.  Other modules needed are in `requirements.txt` file.  All code was run in Python 3.12.3.
 
+All scripts, except for those in `code/w3_sweep`, assume they are being run in the `code` directory.
 
 # Contents
 
@@ -64,7 +65,7 @@ All other parameters are defined in the paper and have corresponding names in `m
 - code/12_between_OR_simulations.py
 - code/13_between_OR_collect_data.py
 - code/14_between_OR_plots.py
-- code/w3_sweep/*
+- code/w3_sweep/*: Note, these scripts assume they're being run in the `code/w3_sweep` directory.
 
 *HPC Versions*: version of code to run all simulations on a SLURM HPC.
 
