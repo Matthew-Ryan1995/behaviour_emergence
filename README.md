@@ -9,6 +9,8 @@ This is a compartmental stochastic model for a covid-like illness with self prot
 
 All scripts, except for those in `code/w3_sweep`, assume they are being run in the `code` directory.
 
+**Note, if any scripts error out due to "dividing by zero" or taking "Mean of empty slice," increase the value of `num_trajectory`.  These errors are likely caused by no infection outbreak being simulated in the CTMC.**
+
 # Contents
 
 *Model code*: Python scripts to fit the CTMC and ODE versions of the compartmental model. 
