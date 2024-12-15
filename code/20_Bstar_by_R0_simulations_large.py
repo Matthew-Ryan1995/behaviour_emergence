@@ -3,9 +3,9 @@
 """
 Created on Tue Apr 30 14:46:18 2024
 
-Vary B* and R0 on the simulations and assess effect on results: Results 1 and 2.
+:todo - Change grain of Bstar and R0 to get smoother outbreak prob plot?
 
-@author: Matt Ryan
+@author: rya200
 """
 # %% Libraries
 from bad_ctmc import *
@@ -17,7 +17,18 @@ import multiprocessing
 import numpy as np
 from datetime import datetime
 
+os.chdir(os.getcwd() + "/code")
+
+
 start_time = datetime.now()
+
+
+mc_cores = os.environ["SLURM_NTASKS"]
+mc_cores = int(mc_cores)
+array_val = os.environ["SLURM_ARRAY_TASK_ID"]
+array_val = int(array_val)
+
+print("Starting job ", array_val)
 # %%
 phantom_counter = 0
 parent_directory = "../data/simulations"
@@ -27,7 +38,7 @@ try:
 except:
     phantom_counter += 1
 
-child_directory = parent_directory + "/Bstar_by_R0"
+child_directory = parent_directory + "/large_scale_Bstar_by_R0"
 
 try:
     os.mkdir(child_directory)
@@ -45,7 +56,8 @@ with open("../data/simulation_parameters.json", "r") as f:
     simulation_parameters = json.load(f)
 f.close()
 
-simulation_parameters["num_trajectory"] = 10000
+simulation_parameters["num_trajectory"] = 1000
+# simulation_parameters["seed"] += array_val
 
 # save_file = child_directory + \
 #     f"/baseline_simulations_seed_{simulation_parameters['seed']}_tend_{simulation_parameters['t_end']}_trajectories_{simulation_parameters['num_trajectory']}.json"
@@ -103,6 +115,7 @@ def run_simulation_with_event(tmp,
     return "Done"
 
 
+# %%
 if __name__ == '__main__':
 
     Bstar_min = 0.01
@@ -124,7 +137,18 @@ if __name__ == '__main__':
     R0 = np.append(R0, 3.28)
 
     int_params = [(x, y) for x in Bstar for y in R0]
-    with multiprocessing.Pool(6) as p:
-        p.map(run_simulation_with_event, int_params)
+
+    step_size = 50
+
+    start_index = ((array_val-1)*step_size)
+    end_index = array_val * step_size
+    if end_index > len(int_params):
+        end_index = len(int_params)
+
+    subset_params = int_params[start_index:end_index]
+    for i in range(20):
+        simulation_parameters["seed"] += 1
+        with multiprocessing.Pool(mc_cores) as p:
+            p.map(run_simulation_with_event, subset_params)
 
     print(f"Time taken: {datetime.now()-start_time}")

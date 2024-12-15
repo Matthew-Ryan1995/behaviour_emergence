@@ -351,7 +351,7 @@ def get_w3(Bstar_min, params: dict):
     return ans
 
 
-def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=0.001):
+def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=20):
     """
     Parameters
     ----------
@@ -360,7 +360,7 @@ def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=0.001):
     P : int, optional
         Population size. The default is 100.
     outbreak_definition : Float, optional
-        Percentage of population needed to be infected to classify major outbreak.  Heuristically chosen. The default is 0.001.
+        Number of population needed to be infected to classify major outbreak.  Heuristically chosen. The default is 0.001.
 
     Returns
     -------
@@ -371,7 +371,7 @@ def get_outbreak(dlr: dict, P: int = 100, outbreak_definition=0.001):
     I = dlr["I_total"]
 
     ans = 0
-    if I[-1] > int(20):
+    if I[-1] > int(outbreak_definition):
         ans = 1
 
     return ans

@@ -72,3 +72,5 @@ All other parameters are defined in the paper and have corresponding names in `m
 *HPC Versions*: version of code to run all simulations on a SLURM HPC.
 
 - HPC_versions/*
+
+**To run large numbers of simulations ($>1000$) as a batch, see the code with suffix `_large`.  This is true for running the simulations, collecting the data, and generating the plots.**
